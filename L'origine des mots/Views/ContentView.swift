@@ -195,10 +195,10 @@ struct ContentView: View {
             ZStack {
                 mainScrollView
                 
-                // Calque opaque fixe pour masquer la status bar
+                // Calque opaque fin (hauteur exacte status bar)
                 VStack {
                     Color(.systemBackground)
-                        .frame(height: 50)
+                        .frame(height: 0)
                         .ignoresSafeArea(edges: .top)
                     Spacer()
                 }
