@@ -16,11 +16,19 @@ struct SourcesView: View {
                         .font(.headline)
                         .padding(.bottom, 4)
                     
-                    // Lien spécifique au mot si fourni
-                    if let word = word {
+                    // Lien spécifique au mot si fourni ET trouvé dans CNRTL
+                    if let word = word, word.foundInCNRTL {
                         Link("• Voir le mot \(word.word) sur CNRTL", 
                              destination: URL(string: "https://www.cnrtl.fr/etymologie/\(word.word.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? word.word)")!)
                             .foregroundColor(.blue)
+                            .font(.system(size: 16))
+                            .padding(.bottom, 8)
+                    }
+                    
+                    // Message pour les composants virtuels
+                    if let word = word, !word.foundInCNRTL && word.source == "Analyse composée" {
+                        Text("• Composant virtuel analysé spécifiquement pour ce mot composé")
+                            .foregroundColor(.orange)
                             .font(.system(size: 16))
                             .padding(.bottom, 8)
                     }
