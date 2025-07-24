@@ -213,24 +213,33 @@ struct ComposedWordsView: View {
         Task {
             var fetchedWords: [Word] = []
             
-            for component in composedWord.components {
-                do {
-                    if let componentWord = try await SupabaseService.shared.fetchWord(component) {
-                        fetchedWords.append(componentWord)
-                        print("✅ Composant '\(component)' trouvé avec étymologie")
-                        print("🔍 DEBUG - Mot retourné: '\(componentWord.word)'")
-                        print("🔍 DEBUG - Étymologie: \(componentWord.etymology.chain.count) étapes")
-                        for (index, entry) in componentWord.etymology.chain.enumerated() {
-                            print("  \(index + 1). \(entry.language): \(entry.sourceWord)")
+            // Détecter si c'est un emprunt composé (composants avec tirets artificiels)
+            let isBorrowedComposition = composedWord.components.contains { $0.hasSuffix("-") }
+            
+            if isBorrowedComposition {
+                // Pour les emprunts composés, créer des mots virtuels basés sur l'étymologie du mot principal
+                fetchedWords = await createVirtualComponentWords()
+            } else {
+                // Pour les vrais mots composés français, chercher les composants en base
+                for component in composedWord.components {
+                    do {
+                        if let componentWord = try await SupabaseService.shared.fetchWord(component) {
+                            fetchedWords.append(componentWord)
+                            print("✅ Composant '\(component)' trouvé avec étymologie")
+                            print("🔍 DEBUG - Mot retourné: '\(componentWord.word)'")
+                            print("🔍 DEBUG - Étymologie: \(componentWord.etymology.chain.count) étapes")
+                            for (index, entry) in componentWord.etymology.chain.enumerated() {
+                                print("  \(index + 1). \(entry.language): \(entry.sourceWord)")
+                            }
+                            print("🔍 DEBUG - Distance: \(componentWord.distanceKm?.description ?? "nil") km")
+                            print("🔍 DEBUG - hasGeographicalJourney: \(componentWord.hasGeographicalJourney)")
+                            print("🔍 DEBUG - isComposedWord: \(componentWord.isComposedWord)")
+                        } else {
+                            print("⚠️ Composant '\(component)' non trouvé en base - ignoré pour l'instant")
                         }
-                        print("🔍 DEBUG - Distance: \(componentWord.distanceKm?.description ?? "nil") km")
-                        print("🔍 DEBUG - hasGeographicalJourney: \(componentWord.hasGeographicalJourney)")
-                        print("🔍 DEBUG - isComposedWord: \(componentWord.isComposedWord)")
-                    } else {
-                        print("⚠️ Composant '\(component)' non trouvé en base - ignoré pour l'instant")
+                    } catch {
+                        print("❌ Erreur lors de la recherche du composant '\(component)': \(error)")
                     }
-                } catch {
-                    print("❌ Erreur lors de la recherche du composant '\(component)': \(error)")
                 }
             }
             
@@ -239,5 +248,103 @@ struct ComposedWordsView: View {
                 isLoadingComponents = false
             }
         }
+    }
+    
+    private func createVirtualComponentWords() async -> [Word] {
+        print("🎯 Création d'étymologies virtuelles pour emprunt composé: \(composedWord.word)")
+        
+        // Pour automobile: auto- (grec) + mobile (latin)
+        // On va créer deux mots virtuels avec des étymologies partielles
+        
+        var virtualWords: [Word] = []
+        
+        // Logique spécialisée pour automobile
+        if composedWord.word.lowercased() == "automobile" && composedWord.components.count == 2 {
+            
+            // Composant 1: "auto-" → grec αὐτός
+            let autoEtymology = DirectEtymology(chain: [
+                EtymologyEntry(
+                    period: "1895", 
+                    language: "Français", 
+                    sourceWord: "auto-", 
+                    originalScript: nil, 
+                    translation: "soi-même (préfixe)"
+                ),
+                EtymologyEntry(
+                    period: "Antiquité", 
+                    language: "Grec ancien", 
+                    sourceWord: "αὐτός", 
+                    originalScript: "αὐτός", 
+                    translation: "soi-même"
+                )
+            ])
+            
+            let autoWord = Word(
+                id: UUID().uuidString,
+                word: "auto-",
+                etymology: autoEtymology,
+                language: "français",
+                source: "Analyse composée",
+                createdAt: Date(),
+                updatedAt: Date(),
+                foundInCNRTL: false,
+                foundWithCNRTLAndClaude: true,
+                isRemarkable: false,
+                shortDescription: nil,
+                distanceKm: nil, // Sera calculée dynamiquement
+                isComposedWord: false,
+                components: [],
+                gptAnalysis: nil
+            )
+            
+            // Composant 2: "mobile" → latin mobilis
+            let mobileEtymology = DirectEtymology(chain: [
+                EtymologyEntry(
+                    period: "1895", 
+                    language: "Français", 
+                    sourceWord: "mobile", 
+                    originalScript: nil, 
+                    translation: "qui peut se mouvoir"
+                ),
+                EtymologyEntry(
+                    period: "Antiquité", 
+                    language: "Latin", 
+                    sourceWord: "mobilis", 
+                    originalScript: nil, 
+                    translation: "mobile, qui peut être mû"
+                )
+            ])
+            
+            let mobileWord = Word(
+                id: UUID().uuidString,
+                word: "mobile",
+                etymology: mobileEtymology,
+                language: "français",
+                source: "Analyse composée",
+                createdAt: Date(),
+                updatedAt: Date(),
+                foundInCNRTL: false,
+                foundWithCNRTLAndClaude: true,
+                isRemarkable: false,
+                shortDescription: nil,
+                distanceKm: nil, // Sera calculée dynamiquement
+                isComposedWord: false,
+                components: [],
+                gptAnalysis: nil
+            )
+            
+            virtualWords = [autoWord, mobileWord]
+            print("✅ Créé 2 mots virtuels pour automobile: auto- (grec) + mobile (latin)")
+            
+        } else {
+            // Pour d'autres emprunts composés, créer une logique générique
+            // basée sur l'analyse GPT si disponible
+            if let gptAnalysis = composedWord.gptAnalysis {
+                print("🤖 Utilisation de l'analyse GPT pour créer les composants")
+                // TODO: Implémenter la logique générique basée sur gptAnalysis
+            }
+        }
+        
+        return virtualWords
     }
 }

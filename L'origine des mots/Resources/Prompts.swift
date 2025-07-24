@@ -31,19 +31,32 @@ enum EtymologyPrompts {
     - Privilégie les vrais changements linguistiques ET géographiques
 
     🧩 DÉTECTION INTELLIGENTE DES MOTS COMPOSÉS :
-    - Analyse le texte pour détecter les expressions comme :
-      * "Composé de X et de Y"
-      * "Composé de X, de Y et de Z" (pour 3+ composants)
-      * "formé de X et Y"
-      * "formé de X, Y et Z"
-      * "Dérivé de X et Y"
-      * "de l'élément préf. X et de Y"
-      * "préf. X et Y"
-      * Tout autre pattern indiquant une composition
-    - Si c'est un mot composé, ajoute un champ "is_composed_word" : true
-    - Ajoute un champ "components" : ["composant1", "composant2", "composant3", ...] avec TOUS les mots de base nettoyés
-    - Pour les mots avec traits d'union (ex: "arc-en-ciel"), analyse s'ils forment une expression idiomatique composée
-    - Continue l'analyse étymologique normalement pour le mot principal
+    
+    🎯 DEUX TYPES À DISTINGUER :
+    
+    1️⃣ MOTS COMPOSÉS FRANÇAIS (avec tirets) :
+    - Mots français formés en français : "arc-en-ciel", "porte-monnaie", "œil-de-bœuf"
+    - Détection : présence de tirets ET composition française
+    - → is_composed_word: true, components: ["arc", "en", "ciel"]
+    
+    2️⃣ EMPRUNTS COMPOSÉS (sans tirets) :
+    - Mots empruntés déjà composés dans leur langue d'origine : "automobile", "téléphone"
+    - Détection : expressions comme "Composé de X et Y" où X et Y viennent de langues anciennes
+    - → is_composed_word: true, components: ["auto-", "mobile"] (avec tirets artificiels)
+    
+    📋 PATTERNS DE DÉTECTION :
+    - "Composé de X et de Y" (emprunts composés)
+    - "Composé de X, de Y et de Z" (emprunts à 3+ composants)  
+    - "formé de [grec] X et [latin] Y" (emprunt composé)
+    - "de l'élément préf. X et de Y" (emprunt composé)
+    - "préf. X et Y" (emprunt composé)
+    - Mots avec tirets visibles (composés français)
+    
+    ✅ RÈGLES DE CLASSIFICATION :
+    - Emprunts composés → composants avec tirets artificiels : ["auto-", "mobile"]
+    - Composés français → composants réels : ["arc", "en", "ciel"]
+    - Continue l'analyse étymologique pour le mot principal
+    - Si emprunt composé, chaque composant aura sa propre étymologie
 
     ✅ AUTRES RÈGLES :
     - Utilise les langues connues en priorité
