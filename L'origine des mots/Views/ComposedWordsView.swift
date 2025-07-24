@@ -197,6 +197,7 @@ struct ComposedWordsView: View {
                     }
                 }
                 .padding(24)
+                .padding(.top, 40)
             }
             .navigationBarHidden(true)
             .sheet(isPresented: $showingMap) {
