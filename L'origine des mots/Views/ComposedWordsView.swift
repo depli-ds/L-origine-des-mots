@@ -409,7 +409,7 @@ struct ComposedWordsView: View {
         } else {
             // Pour d'autres emprunts composés, créer une logique générique
             // basée sur l'analyse GPT si disponible
-            if let gptAnalysis = composedWord.gptAnalysis {
+            if composedWord.gptAnalysis != nil {
                 print("🤖 Utilisation de l'analyse GPT pour créer les composants")
                 // TODO: Implémenter la logique générique basée sur gptAnalysis
             }

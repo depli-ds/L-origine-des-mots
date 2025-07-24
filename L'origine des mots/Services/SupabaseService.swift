@@ -1883,7 +1883,7 @@ class SupabaseService: @unchecked Sendable {
             print("✅ Mot reclassifié comme emprunt composé: \(components)")
             
             // Vider le cache pour forcer le rechargement
-            await clearCache()
+            _ = await clearCache()
         } catch {
             print("❌ ERREUR lors de la reclassification: \(error)")
             throw error
