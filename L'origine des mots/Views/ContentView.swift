@@ -300,6 +300,10 @@ struct ContentView: View {
                     // Champ de recherche centré verticalement
                     searchSection
                     
+                    // Grand espace avant l'historique et les mots remarquables
+                    Spacer()
+                        .frame(height: max(60, (geometry.size.height - 200) / 3))
+                    
                     if !searchHistory.isEmpty {
                         RecentSearchesView(
                             recentSearches: searchHistory,
@@ -315,11 +319,11 @@ struct ContentView: View {
                                 }
                             }
                         )
+                        
+                        // Petit espace entre historique et mots remarquables
+                        Spacer()
+                            .frame(height: 30)
                     }
-                    
-                    // Grand espace avant les mots remarquables (même distance qu'entre titre et champ)
-                    Spacer()
-                        .frame(height: max(60, (geometry.size.height - 200) / 3))
                     
                     RemarkableWordsSection(
                         remarkableWords: remarkableWords,
