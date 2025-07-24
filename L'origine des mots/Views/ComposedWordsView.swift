@@ -218,6 +218,14 @@ struct ComposedWordsView: View {
                     if let componentWord = try await SupabaseService.shared.fetchWord(component) {
                         fetchedWords.append(componentWord)
                         print("✅ Composant '\(component)' trouvé avec étymologie")
+                        print("🔍 DEBUG - Mot retourné: '\(componentWord.word)'")
+                        print("🔍 DEBUG - Étymologie: \(componentWord.etymology.chain.count) étapes")
+                        for (index, entry) in componentWord.etymology.chain.enumerated() {
+                            print("  \(index + 1). \(entry.language): \(entry.sourceWord)")
+                        }
+                        print("🔍 DEBUG - Distance: \(componentWord.distanceKm?.description ?? "nil") km")
+                        print("🔍 DEBUG - hasGeographicalJourney: \(componentWord.hasGeographicalJourney)")
+                        print("🔍 DEBUG - isComposedWord: \(componentWord.isComposedWord)")
                     } else {
                         print("⚠️ Composant '\(component)' non trouvé en base - ignoré pour l'instant")
                     }
