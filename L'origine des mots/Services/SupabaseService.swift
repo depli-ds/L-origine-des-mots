@@ -751,26 +751,7 @@ class SupabaseService: @unchecked Sendable {
                 
                 return word
             } else {
-                // Pour les composants de mots composés, être plus tolérant
-                // Vérifier si le mot recherché est un préfixe/suffixe du mot trouvé
-                let searchWord = wordText.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-                let foundWord = word.word.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-                
-                if searchWord == foundWord || 
-                   foundWord.hasPrefix(searchWord) || 
-                   foundWord.hasSuffix(searchWord) ||
-                   searchWord.hasPrefix(foundWord) ||
-                   searchWord.hasSuffix(foundWord) {
-                    print("✅ Correspondance partielle trouvée: '\(wordText)' ≈ '\(word.word)'")
-                    
-                    // Ajouter au cache temporaire
-                    temporaryWordCache[cleanedWord] = word
-                    cacheTimestamps[cleanedWord] = Date()
-                    
-                    return word
-                } else {
-                    print("⚠️ Mot trouvé '\(word.word)' ne correspond pas au mot recherché '\(wordText)' - ignoré")
-                }
+                print("⚠️ Mot trouvé '\(word.word)' ne correspond pas au mot recherché '\(wordText)' - ignoré")
             }
         }
         
