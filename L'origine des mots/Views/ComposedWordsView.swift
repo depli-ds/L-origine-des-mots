@@ -9,6 +9,7 @@ struct ComposedWordsView: View {
     @State private var selectedWordForMap: Word?
     @State private var showingSources = false
     @State private var selectedWordForSources: Word?
+    @State private var isBorrowedComposition = false
     @Environment(\.dismiss) private var dismiss
     
     init(composedWord: Word, isPresented: Binding<Bool>) {
@@ -25,7 +26,7 @@ struct ComposedWordsView: View {
                     // En-tête 
                     HStack {
                         Spacer()
-                        Text("Origine du mot composé :")
+                        Text(isBorrowedComposition ? "\(composedWord.components.count) origines pour le mot :" : "Origine du mot composé :")
                             .font(.system(size: 16, weight: .light))
                             .foregroundColor(.secondary)
                         Spacer()
@@ -125,7 +126,17 @@ struct ComposedWordsView: View {
                         // Affichage de chaque composant avec son étymologie
                         ForEach(Array(componentWords.enumerated()), id: \.offset) { index, word in
                             VStack(spacing: 20) {
-                                Text(word.word)
+                                // Titre pour emprunts composés
+                                if isBorrowedComposition {
+                                    Text("Origine \(index + 1)")
+                                        .font(.system(size: 18, weight: .medium))
+                                        .foregroundColor(.secondary)
+                                        .padding(.top, index == 0 ? 0 : 20)
+                                }
+                                
+                                // Nettoyer le nom (enlever tirets pour affichage)
+                                let displayName = word.word.hasSuffix("-") ? String(word.word.dropLast()) : word.word
+                                Text(displayName)
                                     .font(.system(size: 40, weight: .medium))
                                 
                                 ForEach(Array(word.etymology.chain.enumerated()), id: \.element.language) { cardIndex, entry in
@@ -214,9 +225,13 @@ struct ComposedWordsView: View {
             var fetchedWords: [Word] = []
             
             // Détecter si c'est un emprunt composé (composants avec tirets artificiels)
-            let isBorrowedComposition = composedWord.components.contains { $0.hasSuffix("-") }
+            let borrowedComposition = composedWord.components.contains { $0.hasSuffix("-") }
             
-            if isBorrowedComposition {
+            await MainActor.run {
+                isBorrowedComposition = borrowedComposition
+            }
+            
+            if borrowedComposition {
                 // Pour les emprunts composés, créer des mots virtuels basés sur l'étymologie du mot principal
                 fetchedWords = await createVirtualComponentWords()
             } else {
@@ -264,7 +279,7 @@ struct ComposedWordsView: View {
             // Composant 1: "auto-" → grec αὐτός
             let autoEtymology = DirectEtymology(chain: [
                 EtymologyEntry(
-                    sourceWord: "auto-",
+                    sourceWord: "auto",
                     language: "Français", 
                     period: "1895", 
                     originalScript: nil, 
@@ -281,7 +296,7 @@ struct ComposedWordsView: View {
             
             let autoWord = Word(
                 id: UUID().uuidString,
-                word: "auto-",
+                word: "auto",
                 etymology: autoEtymology,
                 language: "français",
                 source: "Analyse composée",
