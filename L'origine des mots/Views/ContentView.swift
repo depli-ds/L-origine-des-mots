@@ -195,6 +195,16 @@ struct ContentView: View {
             ZStack {
                 mainScrollView
                 
+                // Calque opaque fixe pour status bar (au-dessus du scroll)
+                VStack {
+                    Rectangle()
+                        .fill(Color(.systemBackground))
+                        .frame(height: 20)
+                        .ignoresSafeArea(edges: .top)
+                    Spacer()
+                }
+                .allowsHitTesting(false)
+                
                 if loadingState.isLoading {
                     ProcessingOverlay(state: loadingState)
                 }
