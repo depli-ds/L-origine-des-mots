@@ -128,8 +128,8 @@ struct ComposedWordsView: View {
                             VStack(spacing: 20) {
                                 // Titre pour emprunts composés
                                 if isBorrowedComposition {
-                                    Text("Origine \(index + 1)")
-                                        .font(.system(size: 18, weight: .medium))
+                                    Text("Origine \(index + 1) :")
+                                        .font(.system(size: 16, weight: .light))
                                         .foregroundColor(.secondary)
                                         .padding(.top, index == 0 ? 0 : 20)
                                 }
