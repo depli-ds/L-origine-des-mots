@@ -288,45 +288,56 @@ struct ContentView: View {
     }
     
     private var mainScrollView: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                AppHeaderView()
-                
-                // Champ de recherche minimaliste
-                searchSection
-                
-                if !searchHistory.isEmpty {
-                    RecentSearchesView(
-                        recentSearches: searchHistory,
-                        onWordTap: { word in
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    AppHeaderView()
+                    
+                    // Spacer pour centrer verticalement le champ de recherche
+                    Spacer()
+                        .frame(height: max(60, (geometry.size.height - 200) / 3))
+                    
+                    // Champ de recherche centré verticalement
+                    searchSection
+                    
+                    if !searchHistory.isEmpty {
+                        RecentSearchesView(
+                            recentSearches: searchHistory,
+                            onWordTap: { word in
+                                Task {
+                                    await reopenWordFromHistory(word)
+                                }
+                            },
+                            onRemove: { word in
+                                if let index = searchHistory.firstIndex(of: word) {
+                                    searchHistory.remove(at: index)
+                                    UserDefaults.standard.set(searchHistory, forKey: "searchHistory")
+                                }
+                            }
+                        )
+                    }
+                    
+                    // Grand espace avant les mots remarquables (même distance qu'entre titre et champ)
+                    Spacer()
+                        .frame(height: max(60, (geometry.size.height - 200) / 3))
+                    
+                    RemarkableWordsSection(
+                        remarkableWords: remarkableWords,
+                        isLoading: isLoadingRemarkableWords,
+                        onWordTap: { remarkableWord in
                             Task {
-                                await reopenWordFromHistory(word)
+                                await reopenWordFromHistory(remarkableWord.word)
                             }
                         },
-                        onRemove: { word in
-                            if let index = searchHistory.firstIndex(of: word) {
-                                searchHistory.remove(at: index)
-                                UserDefaults.standard.set(searchHistory, forKey: "searchHistory")
-                            }
+                        onEditTap: {
+                            showingCuration = true
                         }
                     )
+                    .id("remarkable-words-\(remarkableWords.count)-\(remarkableWords.map { $0.id.uuidString }.joined(separator: "-"))")
+                    
+                    AppFooterView()
                 }
-                
-                RemarkableWordsSection(
-                    remarkableWords: remarkableWords,
-                    isLoading: isLoadingRemarkableWords,
-                    onWordTap: { remarkableWord in
-                        Task {
-                            await reopenWordFromHistory(remarkableWord.word)
-                        }
-                    },
-                    onEditTap: {
-                        showingCuration = true
-                    }
-                )
-                .id("remarkable-words-\(remarkableWords.count)-\(remarkableWords.map { $0.id.uuidString }.joined(separator: "-"))")
-                
-                AppFooterView()
+                .frame(minHeight: geometry.size.height)
             }
         }
     }
@@ -405,10 +416,10 @@ struct ContentView: View {
         searchHistory = []
         UserDefaults.standard.set([], forKey: "searchHistory")
         
-        // Focus automatique au démarrage
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            isSearchFieldFocused = true
-        }
+        // SUPPRIMÉ: Focus automatique pour une interface plus sobre
+        // DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        //     isSearchFieldFocused = true
+        // }
         
         // Vider le cache puis charger les mots remarquables
         Task {
