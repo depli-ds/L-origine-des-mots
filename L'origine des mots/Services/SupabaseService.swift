@@ -733,6 +733,14 @@ class SupabaseService: @unchecked Sendable {
         if let supabaseWord = fallbackWords.first {
             let word = supabaseWord.toWord()
             
+            // DEBUG: Afficher tous les mots trouvés pour diagnostic
+            if fallbackWords.count > 1 {
+                print("🔍 DEBUG: \(fallbackWords.count) mots trouvés avec pattern '*\(wordText)*':")
+                for (index, debugWord) in fallbackWords.prefix(5).enumerated() {
+                    print("  \(index + 1). '\(debugWord.word)'")
+                }
+            }
+            
             // Vérifier que le mot trouvé correspond bien au mot recherché (éviter les duplications)
             if word.word.lowercased() == wordText.lowercased() {
                 print("✅ Mot '\(wordText)' trouvé avec recherche approximative: '\(word.word)'")
@@ -743,7 +751,26 @@ class SupabaseService: @unchecked Sendable {
                 
                 return word
             } else {
-                print("⚠️ Mot trouvé '\(word.word)' ne correspond pas au mot recherché '\(wordText)' - ignoré")
+                // Pour les composants de mots composés, être plus tolérant
+                // Vérifier si le mot recherché est un préfixe/suffixe du mot trouvé
+                let searchWord = wordText.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+                let foundWord = word.word.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+                
+                if searchWord == foundWord || 
+                   foundWord.hasPrefix(searchWord) || 
+                   foundWord.hasSuffix(searchWord) ||
+                   searchWord.hasPrefix(foundWord) ||
+                   searchWord.hasSuffix(foundWord) {
+                    print("✅ Correspondance partielle trouvée: '\(wordText)' ≈ '\(word.word)'")
+                    
+                    // Ajouter au cache temporaire
+                    temporaryWordCache[cleanedWord] = word
+                    cacheTimestamps[cleanedWord] = Date()
+                    
+                    return word
+                } else {
+                    print("⚠️ Mot trouvé '\(word.word)' ne correspond pas au mot recherché '\(wordText)' - ignoré")
+                }
             }
         }
         
