@@ -14,7 +14,9 @@ struct AppHeaderView: View {
         .padding(.top, 5)
         .padding(.bottom, 20)
         .background(
-            Color(.systemBackground)
+            Rectangle()
+                .fill(Color(.systemBackground))
+                .frame(height: 100)
                 .ignoresSafeArea(edges: .top)
         )
     }
