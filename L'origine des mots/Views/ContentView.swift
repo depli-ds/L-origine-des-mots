@@ -376,9 +376,21 @@ struct ContentView: View {
                                 .onSubmit {
                                     performSearch()
                                 }
-                                .onTapGesture {
-                                    isSearchFieldFocused = true
-                                }
+                                                    .onTapGesture {
+                        isSearchFieldFocused = true
+                    }
+                
+                // TEMPORAIRE: Bouton pour reclassifier automobile
+                #if DEBUG
+                Button("🔧 Reclassifier automobile") {
+                    Task {
+                        await reclassifyAutomobile()
+                    }
+                }
+                .padding()
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(8)
+                #endif
                         }
                         
                         // Bouton X près du texte
@@ -429,6 +441,46 @@ struct ContentView: View {
         Task {
             await SupabaseService.shared.clearAllCaches()
             await loadRemarkableWords()
+        }
+    }
+    
+    // TEMPORAIRE: Méthode pour reclassifier automobile
+    private func reclassifyAutomobile() async {
+        print("🚗 Début de la reclassification d'automobile...")
+        
+        do {
+            // 1. Chercher automobile
+            if let automobile = try await SupabaseService.shared.fetchWord("automobile") {
+                print("✅ Automobile trouvé: ID = \(automobile.id)")
+                print("📊 État actuel: isComposedWord = \(automobile.isComposedWord)")
+                print("📊 Composants actuels: \(automobile.components)")
+                
+                // 2. Reclassifier si nécessaire
+                if !automobile.isComposedWord || automobile.components != ["auto-", "mobile"] {
+                    print("🔧 Reclassification nécessaire...")
+                    
+                    try await SupabaseService.shared.reclassifyAsBorrowedComposition(
+                        wordId: automobile.id,
+                        components: ["auto-", "mobile"]
+                    )
+                    
+                    print("🎉 Reclassification terminée !")
+                    
+                    // 3. Vérification
+                    print("🔍 Vérification...")
+                    if let updatedAutomobile = try await SupabaseService.shared.fetchWord("automobile") {
+                        print("✅ Vérification réussie:")
+                        print("   - isComposedWord: \(updatedAutomobile.isComposedWord)")
+                        print("   - components: \(updatedAutomobile.components)")
+                    }
+                } else {
+                    print("✅ Automobile déjà correctement classifié !")
+                }
+            } else {
+                print("❌ Automobile non trouvé en base")
+            }
+        } catch {
+            print("❌ Erreur lors de la reclassification: \(error)")
         }
     }
 }

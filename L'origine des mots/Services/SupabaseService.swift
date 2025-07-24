@@ -1857,6 +1857,38 @@ class SupabaseService: @unchecked Sendable {
         
         print("✅ Tous les caches vidés")
     }
+    
+    /// Reclassifie un mot comme emprunt composé
+    func reclassifyAsBorrowedComposition(wordId: String, components: [String]) async throws {
+        print("🔧 Reclassification du mot '\(wordId)' comme emprunt composé")
+        
+        let url = baseURL.appendingPathComponent("etymologies")
+            .appendingQueryItem("id", value: "eq.\(wordId)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("return=minimal", forHTTPHeaderField: "Prefer")
+        
+        let updateData: [String: Any] = [
+            "is_composed_word": true,
+            "components": components
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: updateData)
+        
+        print("🔍 Données de reclassification: \(updateData)")
+        
+        do {
+            let _: EmptyResponse = try await performRequest(request, decoder: decoder)
+            print("✅ Mot reclassifié comme emprunt composé: \(components)")
+            
+            // Vider le cache pour forcer le rechargement
+            await clearCache()
+        } catch {
+            print("❌ ERREUR lors de la reclassification: \(error)")
+            throw error
+        }
+    }
 }
 
 // MARK: - Extensions et Structures utilitaires
