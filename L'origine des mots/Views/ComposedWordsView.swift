@@ -26,7 +26,7 @@ struct ComposedWordsView: View {
                     // En-tête 
                     HStack {
                         Spacer()
-                        Text(isBorrowedComposition ? "\(composedWord.components.count) origines pour le mot :" : "Origine du mot composé :")
+                        Text("\(composedWord.components.count) origines pour le mot :")
                             .font(.system(size: 16, weight: .light))
                             .foregroundColor(.secondary)
                         Spacer()
@@ -126,13 +126,11 @@ struct ComposedWordsView: View {
                         // Affichage de chaque composant avec son étymologie
                         ForEach(Array(componentWords.enumerated()), id: \.offset) { index, word in
                             VStack(spacing: 20) {
-                                // Titre pour emprunts composés
-                                if isBorrowedComposition {
-                                    Text("Origine \(index + 1) :")
-                                        .font(.system(size: 16, weight: .light))
-                                        .foregroundColor(.secondary)
-                                        .padding(.top, index == 0 ? 0 : 20)
-                                }
+                                // Titre pour tous les composants (emprunts composés ET mots composés français)
+                                Text("Origine \(index + 1) :")
+                                    .font(.system(size: 16, weight: .light))
+                                    .foregroundColor(.secondary)
+                                    .padding(.top, index == 0 ? 0 : 20)
                                 
                                 // Nettoyer le nom (enlever tirets pour affichage)
                                 let displayName = word.word.hasSuffix("-") ? String(word.word.dropLast()) : word.word
