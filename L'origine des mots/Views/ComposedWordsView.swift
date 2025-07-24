@@ -264,16 +264,16 @@ struct ComposedWordsView: View {
             // Composant 1: "auto-" → grec αὐτός
             let autoEtymology = DirectEtymology(chain: [
                 EtymologyEntry(
-                    period: "1895", 
+                    sourceWord: "auto-",
                     language: "Français", 
-                    sourceWord: "auto-", 
+                    period: "1895", 
                     originalScript: nil, 
                     translation: "soi-même (préfixe)"
                 ),
                 EtymologyEntry(
-                    period: "Antiquité", 
+                    sourceWord: "αὐτός",
                     language: "Grec ancien", 
-                    sourceWord: "αὐτός", 
+                    period: "Antiquité", 
                     originalScript: "αὐτός", 
                     translation: "soi-même"
                 )
@@ -300,16 +300,16 @@ struct ComposedWordsView: View {
             // Composant 2: "mobile" → latin mobilis
             let mobileEtymology = DirectEtymology(chain: [
                 EtymologyEntry(
-                    period: "1895", 
+                    sourceWord: "mobile",
                     language: "Français", 
-                    sourceWord: "mobile", 
+                    period: "1895", 
                     originalScript: nil, 
                     translation: "qui peut se mouvoir"
                 ),
                 EtymologyEntry(
-                    period: "Antiquité", 
+                    sourceWord: "mobilis",
                     language: "Latin", 
-                    sourceWord: "mobilis", 
+                    period: "Antiquité", 
                     originalScript: nil, 
                     translation: "mobile, qui peut être mû"
                 )
