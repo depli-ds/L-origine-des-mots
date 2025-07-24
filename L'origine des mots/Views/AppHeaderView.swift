@@ -13,7 +13,10 @@ struct AppHeaderView: View {
         }
         .padding(.top, 30)
         .padding(.bottom, 20)
-        .background(Color(.systemBackground))
+        .background(
+            Color(.systemBackground)
+                .ignoresSafeArea(edges: .top)
+        )
     }
 }
 
