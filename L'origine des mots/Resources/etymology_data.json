@@ -1,0 +1,824 @@
+{
+    "abricot": {
+        "translation": "Fruit rond et parfumé, à noyau, à chair jaune-orangé",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Histoire des mots, Alain Rey, 2019",
+            "Les Routes de la soie, Peter Frankopan, 2015"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "armeniacum",
+                "language": "Latin",
+                "period": "Ier siècle av. J.-C.",
+                "translation": "fruit d'Arménie"
+            },
+            {
+                "sourceWord": "praecoquum",
+                "language": "Latin",
+                "period": "Ier siècle",
+                "translation": "fruit précoce"
+            },
+            {
+                "sourceWord": "praikokion",
+                "language": "Grec byzantin",
+                "period": "Ve siècle",
+                "translation": null
+            },
+            {
+                "sourceWord": "al-barqūq",
+                "language": "Arabe",
+                "period": "VIIe siècle",
+                "translation": null
+            },
+            {
+                "sourceWord": "albaricoque",
+                "language": "Espagnol",
+                "period": "XVe siècle",
+                "translation": null
+            },
+            {
+                "sourceWord": "abricot",
+                "language": "Français",
+                "period": "XVIe siècle",
+                "translation": null
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 40.0691,
+                "longitude": 45.0382,
+                "period": "Ier siècle av. J.-C.",
+                "wordForm": "armeniacum"
+            },
+            {
+                "latitude": 41.9028,
+                "longitude": 12.4964,
+                "period": "Ier siècle",
+                "wordForm": "praecoquum"
+            },
+            {
+                "latitude": 41.0082,
+                "longitude": 28.9784,
+                "period": "Ve siècle",
+                "wordForm": "praikokion"
+            },
+            {
+                "latitude": 33.5138,
+                "longitude": 36.2765,
+                "period": "VIIe siècle",
+                "wordForm": "al-barqūq"
+            },
+            {
+                "latitude": 40.4168,
+                "longitude": -3.7038,
+                "period": "XVe siècle",
+                "wordForm": "albaricoque"
+            },
+            {
+                "latitude": 48.8566,
+                "longitude": 2.3522,
+                "period": "XVIe siècle",
+                "wordForm": "abricot"
+            }
+        ]
+    },
+    "chat": {
+        "translation": "Mammifère carnivore félin domestique",
+        "etymology": [
+            {
+                "sourceWord": "cattus",
+                "language": "Latin",
+                "period": "IVe siècle",
+                "translation": "chat domestique"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 41.9028,
+                "longitude": 12.4964,
+                "period": "IVe siècle",
+                "wordForm": "cattus"
+            }
+        ]
+    },
+    "ecole": {
+        "translation": "Établissement où l'on donne un enseignement collectif",
+        "etymology": [
+            {
+                "sourceWord": "scola",
+                "language": "Latin médiéval",
+                "period": "XIIe siècle",
+                "translation": "école"
+            },
+            {
+                "sourceWord": "schola",
+                "language": "Latin classique",
+                "period": "Ier siècle",
+                "translation": "loisir studieux"
+            },
+            {
+                "sourceWord": "skholē",
+                "originalScript": "σχολή",
+                "language": "Grec ancien",
+                "period": "Ve siècle av. J.-C.",
+                "translation": "loisir, temps libre"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 48.8566,
+                "longitude": 2.3522,
+                "period": "XIIe siècle",
+                "wordForm": "scola"
+            },
+            {
+                "latitude": 41.9028,
+                "longitude": 12.4964,
+                "period": "Ier siècle",
+                "wordForm": "schola"
+            },
+            {
+                "latitude": 37.9838,
+                "longitude": 23.7275,
+                "period": "Ve siècle av. J.-C.",
+                "wordForm": "skholē"
+            }
+        ]
+    },
+    "algorithme": {
+        "translation": "Suite finie et non ambiguë d'opérations permettant de résoudre un problème",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Histoire des mathématiques arabes, A. Djebbar, 2001",
+            "Al-Khwarizmi: The Beginnings of Algebra, R. Rashed, 2009"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "Khwarazm",
+                "originalScript": "خوارزم",
+                "language": "Persan",
+                "period": "VIe siècle",
+                "translation": "région d'Asie centrale"
+            },
+            {
+                "sourceWord": "Al-Khwarizmi",
+                "originalScript": "الخوارزمي",
+                "language": "Arabe",
+                "period": "IXe siècle",
+                "translation": "nom du mathématicien perse"
+            },
+            {
+                "sourceWord": "algorismus",
+                "language": "Latin médiéval",
+                "period": "XIIe siècle",
+                "translation": "art du calcul avec les chiffres arabes"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 41.3775,
+                "longitude": 60.3594,
+                "period": "VIe siècle",
+                "wordForm": "Khwarazm"
+            },
+            {
+                "latitude": 33.3152,
+                "longitude": 44.3661,
+                "period": "IXe siècle",
+                "wordForm": "Al-Khwarizmi"
+            },
+            {
+                "latitude": 45.4642,
+                "longitude": 9.1900,
+                "period": "XIIe siècle",
+                "wordForm": "algorismus"
+            }
+        ]
+    },
+    "cafe": {
+        "translation": "Boisson stimulante préparée à partir de grains de caféier torréfiés et moulus",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Histoire du café, H. Jacob, 2018",
+            "Le Livre du café, J. Morris, 2016"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "kahve",
+                "language": "Turc ottoman",
+                "period": "XVIe siècle",
+                "translation": "café"
+            },
+            {
+                "sourceWord": "qahwa",
+                "originalScript": "قهوة",
+                "language": "Arabe",
+                "period": "XIVe siècle",
+                "translation": "boisson stimulante"
+            },
+            {
+                "sourceWord": "Kaffa",
+                "language": "Éthiopien",
+                "period": "VIe siècle",
+                "translation": "région d'origine du café"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 7.2665,
+                "longitude": 36.2405,
+                "period": "VIe siècle",
+                "wordForm": "Kaffa"
+            },
+            {
+                "latitude": 21.4225,
+                "longitude": 39.8262,
+                "period": "XIVe siècle",
+                "wordForm": "qahwa"
+            },
+            {
+                "latitude": 41.0082,
+                "longitude": 28.9784,
+                "period": "XVIe siècle",
+                "wordForm": "kahve"
+            }
+        ]
+    },
+    "orange": {
+        "translation": "Fruit de l'oranger, agrume de couleur orange",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Histoire des fruits, M. Toussaint-Samat, 2008",
+            "Les Routes de la soie, Peter Frankopan, 2015"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "naranja",
+                "language": "Espagnol",
+                "period": "XIIIe siècle",
+                "translation": "orange"
+            },
+            {
+                "sourceWord": "naranj",
+                "originalScript": "نرنج",
+                "language": "Arabe",
+                "period": "IXe siècle",
+                "translation": "orange amère"
+            },
+            {
+                "sourceWord": "narang",
+                "originalScript": "نارنگ",
+                "language": "Persan",
+                "period": "VIe siècle",
+                "translation": "orange"
+            },
+            {
+                "sourceWord": "naraṅga",
+                "originalScript": "नारङ्ग",
+                "language": "Sanskrit",
+                "period": "IIe siècle av. J.-C.",
+                "translation": "oranger"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 20.5937,
+                "longitude": 78.9629,
+                "period": "IIe siècle av. J.-C.",
+                "wordForm": "naraṅga"
+            },
+            {
+                "latitude": 32.4279,
+                "longitude": 53.6880,
+                "period": "VIe siècle",
+                "wordForm": "narang"
+            },
+            {
+                "latitude": 33.5138,
+                "longitude": 36.2765,
+                "period": "IXe siècle",
+                "wordForm": "naranj"
+            },
+            {
+                "latitude": 40.4168,
+                "longitude": -3.7038,
+                "period": "XIIIe siècle",
+                "wordForm": "naranja"
+            }
+        ]
+    },
+    "assassin": {
+        "translation": "Personne qui commet un meurtre avec préméditation",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Les Assassins : Histoire et doctrine d'une secte terroriste en Islam, B. Lewis, 1982",
+            "Dictionnaire historique de la langue française, Alain Rey"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "gubbah",
+                "originalScript": "גובה",
+                "language": "Araméen",
+                "period": "IIIe siècle",
+                "translation": "manteau, vêtement extérieur"
+            },
+            {
+                "sourceWord": "hashshashin",
+                "originalScript": "حشّاشين",
+                "language": "Arabe",
+                "period": "XIe siècle",
+                "translation": "consommateurs de haschisch"
+            },
+            {
+                "sourceWord": "assassin",
+                "language": "Ancien français",
+                "period": "XIIIe siècle",
+                "translation": "tueur à gages"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 36.4636,
+                "longitude": 50.3453,
+                "period": "XIe siècle",
+                "wordForm": "hashshashin"
+            },
+            {
+                "latitude": 35.1916,
+                "longitude": 36.3575,
+                "period": "XIIe siècle",
+                "wordForm": "hashshashin"
+            },
+            {
+                "latitude": 45.8566,
+                "longitude": 2.3522,
+                "period": "XIIIe siècle",
+                "wordForm": "assassin"
+            }
+        ]
+    },
+    "zero": {
+        "translation": "Nombre qui représente une quantité nulle, symbole du néant",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Histoire universelle des chiffres, Georges Ifrah, 1994",
+            "L'Empire des nombres, Denis Guedj, 2005"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "zephirum",
+                "language": "Latin médiéval",
+                "period": "XIIe siècle",
+                "translation": "zéro"
+            },
+            {
+                "sourceWord": "ṣifr",
+                "originalScript": "صفر",
+                "language": "Arabe",
+                "period": "IXe siècle",
+                "translation": "vide"
+            },
+            {
+                "sourceWord": "śūnya",
+                "originalScript": "शन्य",
+                "language": "Sanskrit",
+                "period": "IVe siècle av. J.-C.",
+                "translation": "vide, néant"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 27.1751,
+                "longitude": 78.0421,
+                "period": "IVe siècle av. J.-C.",
+                "wordForm": "śūnya"
+            },
+            {
+                "latitude": 33.3152,
+                "longitude": 44.3661,
+                "period": "IXe siècle",
+                "wordForm": "ṣifr"
+            },
+            {
+                "latitude": 43.7696,
+                "longitude": 11.2558,
+                "period": "XIIe siècle",
+                "wordForm": "zephirum"
+            }
+        ]
+    },
+    "sucre": {
+        "translation": "Substance alimentaire douce, cristallisée, extraite principalement de la canne à sucre et de la betterave",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Histoire du sucre, histoire du monde, J. Meyer, 2020",
+            "Les Routes de la soie, Peter Frankopan, 2015"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "zucchero",
+                "language": "Italien",
+                "period": "XIIIe siècle",
+                "translation": "sucre"
+            },
+            {
+                "sourceWord": "sukkar",
+                "originalScript": "سُكَّر",
+                "language": "Arabe",
+                "period": "VIIIe siècle",
+                "translation": "sucre"
+            },
+            {
+                "sourceWord": "śarkarā",
+                "originalScript": "शर्करा",
+                "language": "Sanskrit",
+                "period": "VIe siècle av. J.-C.",
+                "translation": "grains de sable, sucre cristallisé"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 25.3176,
+                "longitude": 82.9739,
+                "period": "VIe siècle av. J.-C.",
+                "wordForm": "śarkarā"
+            },
+            {
+                "latitude": 33.3152,
+                "longitude": 44.3661,
+                "period": "VIIIe siècle",
+                "wordForm": "sukkar"
+            },
+            {
+                "latitude": 45.4642,
+                "longitude": 9.1900,
+                "period": "XIIIe siècle",
+                "wordForm": "zucchero"
+            }
+        ]
+    },
+    "paradis": {
+        "translation": "Lieu de félicité éternelle, séjour des bienheureux",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Dictionnaire historique de la langue française, Alain Rey",
+            "Les langues indo-européennes, A. Meillet, 2017"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "paridaida",
+                "originalScript": "𐬞𐬀𐬭𐬀𐬛𐬀𐬉𐬰𐬀",
+                "language": "Avestique",
+                "period": "VIIIe siècle av. J.-C.",
+                "translation": "enceinte circulaire, jardin royal"
+            },
+            {
+                "sourceWord": "parádeisos",
+                "originalScript": "παράδεισος",
+                "language": "Grec ancien",
+                "period": "Ve siècle av. J.-C.",
+                "translation": "parc, jardin"
+            },
+            {
+                "sourceWord": "paradisus",
+                "language": "Latin",
+                "period": "Ier siècle",
+                "translation": "jardin, paradis"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 29.9792,
+                "longitude": 52.8755,
+                "period": "VIIIe siècle av. J.-C.",
+                "wordForm": "paridaida"
+            },
+            {
+                "latitude": 37.9838,
+                "longitude": 23.7275,
+                "period": "Ve siècle av. J.-C.",
+                "wordForm": "parádeisos"
+            },
+            {
+                "latitude": 41.9028,
+                "longitude": 12.4964,
+                "period": "Ier siècle",
+                "wordForm": "paradisus"
+            }
+        ]
+    },
+    "tasse": {
+        "translation": "Petit récipient à anse servant à boire",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Dictionnaire historique de la langue française, Alain Rey",
+            "Les mots voyageurs, H. Walter, 1997"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "tast",
+                "originalScript": "طاس",
+                "language": "Persan",
+                "period": "VIe siècle",
+                "translation": "coupe, récipient"
+            },
+            {
+                "sourceWord": "ṭāsa",
+                "originalScript": "طاسة",
+                "language": "Arabe",
+                "period": "IXe siècle",
+                "translation": "écuelle"
+            },
+            {
+                "sourceWord": "tazza",
+                "language": "Italien",
+                "period": "XIVe siècle",
+                "translation": "coupe"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 35.6892,
+                "longitude": 51.3890,
+                "period": "VIe siècle",
+                "wordForm": "tast"
+            },
+            {
+                "latitude": 33.3152,
+                "longitude": 44.3661,
+                "period": "IXe siècle",
+                "wordForm": "ṭāsa"
+            },
+            {
+                "latitude": 43.7696,
+                "longitude": 11.2558,
+                "period": "XIVe siècle",
+                "wordForm": "tazza"
+            }
+        ]
+    },
+    "jupe": {
+        "translation": "Vêtement féminin qui descend des hanches",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Dictionnaire historique de la langue française, Alain Rey",
+            "Histoire du costume en Occident, F. Boucher, 2008"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "aljuba",
+                "language": "Espagnol médiéval",
+                "period": "XIIe siècle",
+                "translation": "vêtement mauresque"
+            },
+            {
+                "sourceWord": "jubba",
+                "originalScript": "جُبَّة",
+                "language": "Arabe",
+                "period": "VIIIe siècle",
+                "translation": "vêtement long"
+            },
+            {
+                "sourceWord": "gubbah",
+                "originalScript": "גובה",
+                "language": "Araméen",
+                "period": "IIIe siècle",
+                "translation": "manteau, vêtement extérieur"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 31.7683,
+                "longitude": 35.2137,
+                "period": "IIIe siècle",
+                "wordForm": "gubbah"
+            },
+            {
+                "latitude": 33.5138,
+                "longitude": 36.2765,
+                "period": "VIIIe siècle",
+                "wordForm": "jubba"
+            },
+            {
+                "latitude": 37.8882,
+                "longitude": -4.7794,
+                "period": "XIIe siècle",
+                "wordForm": "aljuba"
+            }
+        ]
+    },
+    "hasard": {
+        "translation": "Cause imprévisible et souvent personnifiée attribuée à ce qui arrive sans raison apparente",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Dictionnaire historique de la langue française, Alain Rey",
+            "Histoire des jeux de hasard, G. Belmas, 2006"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "azar",
+                "language": "Espagnol médiéval",
+                "period": "XIIe siècle",
+                "translation": "jeu de dés"
+            },
+            {
+                "sourceWord": "az-zahr",
+                "originalScript": "الزهر",
+                "language": "Arabe",
+                "period": "IXe siècle",
+                "translation": "dé à jouer"
+            },
+            {
+                "sourceWord": "zahr",
+                "originalScript": "زهر",
+                "language": "Arabe classique",
+                "period": "VIe siècle",
+                "translation": "fleur, dé (par analogie de forme)"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 30.0444,
+                "longitude": 31.2357,
+                "period": "VIe siècle",
+                "wordForm": "zahr"
+            },
+            {
+                "latitude": 33.5138,
+                "longitude": 36.2765,
+                "period": "IXe siècle",
+                "wordForm": "az-zahr"
+            },
+            {
+                "latitude": 37.8882,
+                "longitude": -4.7794,
+                "period": "XIIe siècle",
+                "wordForm": "azar"
+            }
+        ]
+    },
+    "alcool": {
+        "translation": "Liquide volatil obtenu par la distillation du vin ou d'autres substances fermentées",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Dictionnaire historique de la langue française, Alain Rey",
+            "Histoire de la chimie, B. Wojtkowiak, 2000"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "kohl",
+                "originalScript": "كحل",
+                "language": "Arabe ancien",
+                "period": "VIe siècle",
+                "translation": "poudre fine pour les yeux"
+            },
+            {
+                "sourceWord": "al-kuḥl",
+                "originalScript": "الكحل",
+                "language": "Arabe",
+                "period": "IXe siècle",
+                "translation": "antimoine pulvérisé pour le maquillage des yeux"
+            },
+            {
+                "sourceWord": "alcohol",
+                "language": "Espagnol médiéval",
+                "period": "XIIIe siècle",
+                "translation": "poudre fine de fard"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 21.4225,
+                "longitude": 39.8262,
+                "period": "VIe siècle",
+                "wordForm": "kohl"
+            },
+            {
+                "latitude": 33.5138,
+                "longitude": 36.2765,
+                "period": "IXe siècle",
+                "wordForm": "al-kuḥl"
+            },
+            {
+                "latitude": 37.8882,
+                "longitude": -4.7794,
+                "period": "XIIIe siècle",
+                "wordForm": "alcohol"
+            }
+        ]
+    },
+    "alchimie": {
+        "translation": "Science occulte qui cherchait la pierre philosophale et la panacée universelle",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Histoire de l'alchimie, S. Matton, 1995",
+            "Les origines de l'alchimie dans l'Égypte gréco-romaine, J. Lindsay, 1986"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "alchemia",
+                "language": "Latin médiéval",
+                "period": "XIIe siècle",
+                "translation": "alchimie"
+            },
+            {
+                "sourceWord": "al-kīmiyā",
+                "originalScript": "الخيمياء",
+                "language": "Arabe",
+                "period": "VIIIe siècle",
+                "translation": "art de la transmutation"
+            },
+            {
+                "sourceWord": "khēmeia",
+                "originalScript": "χυμεία",
+                "language": "Grec",
+                "period": "IVe siècle",
+                "translation": "art de la fusion des métaux"
+            },
+            {
+                "sourceWord": "kēme",
+                "originalScript": "𓆎𓅓𓏏",
+                "language": "Égyptien ancien",
+                "period": "IIIe siècle av. J.-C.",
+                "translation": "terre noire (l'Égypte)"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 30.0444,
+                "longitude": 31.2357,
+                "period": "IIIe siècle av. J.-C.",
+                "wordForm": "kēme"
+            },
+            {
+                "latitude": 31.2001,
+                "longitude": 29.9187,
+                "period": "IVe siècle",
+                "wordForm": "khēmeia"
+            },
+            {
+                "latitude": 33.3152,
+                "longitude": 44.3661,
+                "period": "VIIIe siècle",
+                "wordForm": "al-kīmiyā"
+            },
+            {
+                "latitude": 45.4642,
+                "longitude": 9.1900,
+                "period": "XIIe siècle",
+                "wordForm": "alchemia"
+            }
+        ]
+    },
+    "amiral": {
+        "translation": "Officier général de la marine militaire",
+        "sources": [
+            "CNRTL - Centre National de Ressources Textuelles et Lexicales",
+            "Dictionnaire historique de la langue française, Alain Rey",
+            "Histoire maritime de la Méditerranée, M. Balard, 2017"
+        ],
+        "etymology": [
+            {
+                "sourceWord": "amiralh",
+                "language": "Ancien provençal",
+                "period": "XIIe siècle",
+                "translation": "chef de la flotte"
+            },
+            {
+                "sourceWord": "amīr al-baḥr",
+                "originalScript": "أمير البحر",
+                "language": "Arabe",
+                "period": "IXe siècle",
+                "translation": "commandant de la mer"
+            },
+            {
+                "sourceWord": "amīr",
+                "originalScript": "أمير",
+                "language": "Arabe ancien",
+                "period": "VIe siècle",
+                "translation": "chef, prince"
+            }
+        ],
+        "locations": [
+            {
+                "latitude": 21.4225,
+                "longitude": 39.8262,
+                "period": "VIe siècle",
+                "wordForm": "amīr"
+            },
+            {
+                "latitude": 31.2001,
+                "longitude": 29.9187,
+                "period": "IXe siècle",
+                "wordForm": "amīr al-baḥr"
+            },
+            {
+                "latitude": 43.2965,
+                "longitude": 5.3698,
+                "period": "XIIe siècle",
+                "wordForm": "amiralh"
+            }
+        ]
+    }
+} 
