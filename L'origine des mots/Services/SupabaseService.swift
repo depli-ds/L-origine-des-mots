@@ -615,7 +615,7 @@ class SupabaseService: @unchecked Sendable {
         return []
     }
     
-    // Méthode pour récupérer un mot spécifique
+    // Méthode pour récupérer un mot spécifique avec double vérification anti-conflit
     func fetchWord(_ wordText: String) async throws -> Word? {
         print("🔍 Recherche du mot '\(wordText)' en base...")
         
@@ -650,15 +650,37 @@ class SupabaseService: @unchecked Sendable {
             }
         }
         
-        // Recherche en base de données avec champs explicites - correspondance exacte insensible à la casse
-        let url = baseURL.appendingPathComponent("etymologies")
+        // Double vérification : recherche exacte ET ilike pour éviter les conflits
+        // 1. Vérification exacte d'abord (plus stricte)
+        let exactUrl = baseURL.appendingPathComponent("etymologies")
+            .appendingQueryItem("select", value: "id,word,etymology,created_at,short_description,distance_km,is_remarkable,is_composed_word,components")
+            .appendingQueryItem("word", value: "eq.\(wordText)")
+            .appendingQueryItem("limit", value: "1")
+        
+        print("🔍 Vérification exacte: \(exactUrl)")
+        var request = URLRequest(url: exactUrl)
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData // Force refresh
+        
+        let (exactData, exactResponse) = try await session.data(for: request)
+        if let httpResponse = exactResponse as? HTTPURLResponse, 
+           httpResponse.statusCode == 200,
+           let exactWords: [SupabaseWord] = try? remarkableWordDecoder.decode([SupabaseWord].self, from: exactData),
+           !exactWords.isEmpty {
+            print("✅ Correspondance EXACTE trouvée pour '\(wordText)'")
+            let word = exactWords.first!.toWord()
+            temporaryWordCache[cleanedWord] = word
+            return word
+        }
+        
+        // 2. Si pas de correspondance exacte, essayer ilike
+        let ilikeUrl = baseURL.appendingPathComponent("etymologies")
             .appendingQueryItem("select", value: "id,word,etymology,created_at,short_description,distance_km,is_remarkable,is_composed_word,components")
             .appendingQueryItem("word", value: "ilike.\(wordText)")
             .appendingQueryItem("limit", value: "1")
         
-        print("🔍 URL de recherche: \(url)")
-        
-        let request = URLRequest(url: url)
+        print("🔍 Recherche ilike: \(ilikeUrl)")
+        request = URLRequest(url: ilikeUrl)
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData // Force refresh
         
         // 🔍 DEBUG: Logger la réponse brute de Supabase
         let (data, response) = try await session.data(for: request)
