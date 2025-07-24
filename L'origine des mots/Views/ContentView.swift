@@ -343,6 +343,9 @@ struct ContentView: View {
                 }
                 .frame(minHeight: geometry.size.height)
             }
+            .safeAreaInset(edge: .top) {
+                Color.clear.frame(height: 50)
+            }
         }
     }
     
