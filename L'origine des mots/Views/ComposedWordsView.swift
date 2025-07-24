@@ -291,11 +291,20 @@ struct ComposedWordsView: View {
                 foundWithCNRTLAndClaude: true,
                 isRemarkable: false,
                 shortDescription: nil,
-                distanceKm: nil, // Sera calculée dynamiquement
+                distanceKm: nil, // Sera calculée après création
                 isComposedWord: false,
                 components: [],
                 gptAnalysis: nil
             )
+            
+            // Calcul de la distance pour auto-
+            var autoDistance: Double = 0
+            do {
+                autoDistance = try await autoWord.calculateEtymologicalDistance()
+                print("📏 Distance calculée pour auto-: \(autoDistance) km")
+            } catch {
+                print("⚠️ Erreur calcul distance auto-: \(error)")
+            }
             
             // Composant 2: "mobile" → latin mobilis
             let mobileEtymology = DirectEtymology(chain: [
@@ -327,13 +336,59 @@ struct ComposedWordsView: View {
                 foundWithCNRTLAndClaude: true,
                 isRemarkable: false,
                 shortDescription: nil,
-                distanceKm: nil, // Sera calculée dynamiquement
+                distanceKm: nil, // Sera calculée après création
                 isComposedWord: false,
                 components: [],
                 gptAnalysis: nil
             )
             
-            virtualWords = [autoWord, mobileWord]
+            // Calcul de la distance pour mobile
+            var mobileDistance: Double = 0
+            do {
+                mobileDistance = try await mobileWord.calculateEtymologicalDistance()
+                print("📏 Distance calculée pour mobile: \(mobileDistance) km")
+            } catch {
+                print("⚠️ Erreur calcul distance mobile: \(error)")
+            }
+            
+            // Créer les mots finaux avec les distances calculées
+            let finalAutoWord = Word(
+                id: autoWord.id,
+                word: autoWord.word,
+                etymology: autoWord.etymology,
+                language: autoWord.language,
+                source: autoWord.source,
+                createdAt: autoWord.createdAt,
+                updatedAt: autoWord.updatedAt,
+                foundInCNRTL: autoWord.foundInCNRTL,
+                foundWithCNRTLAndClaude: autoWord.foundWithCNRTLAndClaude,
+                isRemarkable: autoWord.isRemarkable,
+                shortDescription: autoWord.shortDescription,
+                distanceKm: autoDistance,
+                isComposedWord: autoWord.isComposedWord,
+                components: autoWord.components,
+                gptAnalysis: autoWord.gptAnalysis
+            )
+            
+            let finalMobileWord = Word(
+                id: mobileWord.id,
+                word: mobileWord.word,
+                etymology: mobileWord.etymology,
+                language: mobileWord.language,
+                source: mobileWord.source,
+                createdAt: mobileWord.createdAt,
+                updatedAt: mobileWord.updatedAt,
+                foundInCNRTL: mobileWord.foundInCNRTL,
+                foundWithCNRTLAndClaude: mobileWord.foundWithCNRTLAndClaude,
+                isRemarkable: mobileWord.isRemarkable,
+                shortDescription: mobileWord.shortDescription,
+                distanceKm: mobileDistance,
+                isComposedWord: mobileWord.isComposedWord,
+                components: mobileWord.components,
+                gptAnalysis: mobileWord.gptAnalysis
+            )
+            
+            virtualWords = [finalAutoWord, finalMobileWord]
             print("✅ Créé 2 mots virtuels pour automobile: auto- (grec) + mobile (latin)")
             
         } else {
