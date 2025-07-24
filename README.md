@@ -37,7 +37,7 @@ Les contributions sont les bienvenues ! N'hésitez pas à ouvrir des issues ou p
 
 ## 📄 Licence
 
-*[Licence à définir]*
+MIT License - voir [LICENSE](LICENSE) pour plus de détails
 
 ## 👨‍💻 Auteur
 
