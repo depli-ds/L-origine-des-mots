@@ -57,6 +57,11 @@ extension Word {
 
     var hasGeographicalJourney: Bool {
         let uniqueLanguages = Set(etymology.chain.map { $0.language })
+        // Pour les mots composés, afficher la carte même sans distance calculée
+        if isComposedWord {
+            return uniqueLanguages.count > 1
+        }
+        // Pour les mots normaux, exiger une distance valide
         let hasValidDistance = (distanceKm ?? 0) > 0
         return uniqueLanguages.count > 1 && hasValidDistance
     }
