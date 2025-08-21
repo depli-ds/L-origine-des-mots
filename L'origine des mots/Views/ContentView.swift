@@ -419,20 +419,24 @@ struct ContentView: View {
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(colorScheme == .dark ? Color.black : Color.white)
-                    )
-                    .overlay(
-                        // Ombre interne classique avec double contour
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(Color.clear, lineWidth: 1)
-                            .shadow(
-                                color: colorScheme == .dark ? .black.opacity(0.8) : .black.opacity(0.3),
-                                radius: 4,
-                                x: 3,
-                                y: 3
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        colorScheme == .dark 
+                                            ? Color.gray.opacity(0.3) 
+                                            : Color.gray.opacity(0.1),
+                                        colorScheme == .dark 
+                                            ? Color.black 
+                                            : Color.white
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
-                            .blendMode(.multiply)
+                            .shadow(
+                                color: colorScheme == .dark ? .white.opacity(0.05) : .black.opacity(0.1),
+                                radius: 10
+                            )
                     )
                     
                     Spacer()
