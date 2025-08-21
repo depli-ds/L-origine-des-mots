@@ -376,8 +376,19 @@ struct ContentView: View {
                 HStack {
                     Spacer()
                     
-                    // Conteneur du texte et de la croix avec style des cartes
-                    HStack(spacing: 4) {
+                    // Conteneur du texte avec loupe et X intégrés
+                    HStack(spacing: 12) {
+                        // Loupe À GAUCHE dans le bloc
+                        Button(action: {
+                            performSearch()
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                        }
+                        .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
+                        
                         // Zone de texte avec placeholder
                         ZStack {
                             // Placeholder "Rechercher" quand vide et non focalisé
@@ -399,12 +410,12 @@ struct ContentView: View {
                                 .onSubmit {
                                     performSearch()
                                 }
-                                                    .onTapGesture {
-                        isSearchFieldFocused = true
-                    }
+                                .onTapGesture {
+                                    isSearchFieldFocused = true
+                                }
                         }
                         
-                        // Bouton X près du texte
+                        // Bouton X À DROITE
                         if !searchText.isEmpty {
                             Button(action: {
                                 searchText = ""
@@ -419,40 +430,25 @@ struct ContentView: View {
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        colorScheme == .dark 
-                                            ? Color.gray.opacity(0.3) 
-                                            : Color.gray.opacity(0.1),
-                                        colorScheme == .dark 
-                                            ? Color.black 
-                                            : Color.white
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .shadow(
-                                color: colorScheme == .dark ? .white.opacity(0.05) : .black.opacity(0.1),
-                                radius: 10
+                            .fill(colorScheme == .dark ? Color.black : Color.white)
+                            .overlay(
+                                // Ombre interne INVERSE de la carte (ombre vers l'intérieur)
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.clear)
+                                    .shadow(
+                                        color: colorScheme == .dark ? .black.opacity(0.8) : .black.opacity(0.15),
+                                        radius: 6,
+                                        x: -3,  // INVERSE: ombre vers la gauche
+                                        y: -3   // INVERSE: ombre vers le haut
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    .blendMode(.multiply)
                             )
                     )
                     
                     Spacer()
                 }
-                
-                // Loupe EN DESSOUS comme demandé
-                Button(action: {
-                    performSearch()
-                }) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-                .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
-                .animation(.easeInOut(duration: 0.2), value: searchText.isEmpty)
+
             }
             .padding(.horizontal, 40)
             .padding(.top, 16)
