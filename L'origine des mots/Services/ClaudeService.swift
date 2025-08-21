@@ -115,6 +115,11 @@ class ClaudeService: @unchecked Sendable {
         guard httpResponse.statusCode == 200 else {
             if let errorString = String(data: data, encoding: .utf8) {
                 print("❌ Erreur Claude: \(errorString)")
+                
+                // Détecter l'erreur "overloaded" spécifiquement
+                if errorString.contains("overloaded") || httpResponse.statusCode == 529 {
+                    print("🚫 Claude surchargé - cette erreur déclenchera le fallback GPT")
+                }
             }
             throw ServiceError.httpError(httpResponse.statusCode)
         }

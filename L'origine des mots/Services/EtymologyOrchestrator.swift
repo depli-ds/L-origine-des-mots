@@ -72,10 +72,21 @@ class EtymologyOrchestrator {
         let knownLanguages = try await SupabaseService.shared.fetchLanguageNames()
         print("✅ \(knownLanguages.count) langues connues chargées")
         
-        // 4. Analyse avec Claude (service principal)
+        // 4. Analyse avec Claude (service principal) + fallback GPT
         print("🤖 Étape 4: Analyse avec Claude...")
-        let etymologyAnalysis = try await ClaudeService.shared.analyzeEtymology(etymologyText, knownLanguages: knownLanguages)
-        print("✅ Analyse Claude terminée - \(etymologyAnalysis.etymology.chain.count) étapes étymologiques")
+        var etymologyAnalysis: EtymologyAnalysis
+        
+        do {
+            etymologyAnalysis = try await ClaudeService.shared.analyzeEtymology(etymologyText, knownLanguages: knownLanguages)
+            print("✅ Analyse Claude terminée - \(etymologyAnalysis.etymology.chain.count) étapes étymologiques")
+        } catch {
+            print("⚠️ Claude échoué (\(error)), fallback vers GPT-4...")
+            
+            // Fallback vers GPT-4
+            let gptResponse = try await GPT4Service.shared.analyzeEtymology(etymologyText, knownLanguages: knownLanguages)
+            etymologyAnalysis = gptResponse
+            print("✅ Analyse GPT-4 terminée - \(etymologyAnalysis.etymology.chain.count) étapes étymologiques")
+        }
         
         // 5. Validation : Identifier les mots avec des étymologies trop simples (sans rejeter)
         var hasMinimumEtymology = true

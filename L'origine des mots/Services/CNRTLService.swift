@@ -221,7 +221,7 @@ class CNRTLService {
                 if etymologyText.count >= 50 { // Seuil adapté pour les textes riches
                     print("✅ Extraction alternative réussie (\(etymologyText.count) caractères)")
                     print("📝 Aperçu: \(String(etymologyText.prefix(100)))...")
-                    return etymologyText
+            return etymologyText
                 }
             }
         }
