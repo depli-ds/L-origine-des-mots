@@ -429,22 +429,28 @@ struct ContentView: View {
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(Color(.systemBackground))
+                            .fill(
+                                // Fond avec gradient subtil pour effet enfoncé
+                                LinearGradient(
+                                    colors: [
+                                        colorScheme == .dark 
+                                            ? Color(.systemGray6).opacity(0.3)
+                                            : Color(.systemGray6).opacity(0.8),
+                                        colorScheme == .dark 
+                                            ? Color(.systemBackground)
+                                            : Color(.systemBackground)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
                             .overlay(
-                                // Ombre interne pour effet creusé
+                                // Liseret simple et net
                                 RoundedRectangle(cornerRadius: 20)
                                     .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                colorScheme == .dark ? Color.white.opacity(0.2) : Color.black.opacity(0.2),
-                                                Color.clear
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
+                                        colorScheme == .dark ? Color.gray.opacity(0.3) : Color.gray.opacity(0.2),
                                         lineWidth: 1
                                     )
-                                    .blur(radius: 1)
                             )
                     )
                     
