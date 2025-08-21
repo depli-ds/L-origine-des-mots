@@ -45,7 +45,7 @@ class OpenAIService {
         
         // Corps de la requête
         let body: [String: Any] = [
-            "model": "gpt-4",
+            "model": "gpt-5",
             "messages": [
                 ["role": "user", "content": message]
             ]
