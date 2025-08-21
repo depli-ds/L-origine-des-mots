@@ -415,47 +415,36 @@ struct ContentView: View {
                             }
                         }
                         
-                        // Loupe intégrée dans le bloc
-                        Button(action: {
-                            performSearch()
-                        }) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.title2)
-                                .foregroundColor(.secondary)
-                        }
-                        .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                     }
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(
-                                // Fond avec gradient subtil pour effet enfoncé
-                                LinearGradient(
-                                    colors: [
-                                        colorScheme == .dark 
-                                            ? Color(.systemGray6).opacity(0.3)
-                                            : Color(.systemGray6).opacity(0.8),
-                                        colorScheme == .dark 
-                                            ? Color(.systemBackground)
-                                            : Color(.systemBackground)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
+                            .fill(colorScheme == .dark ? Color.black : Color.white)
+                            .shadow(
+                                color: colorScheme == .dark ? .black.opacity(0.3) : .black.opacity(0.2),
+                                radius: 8,
+                                x: 0,
+                                y: 0
                             )
-                            .overlay(
-                                // Liseret simple et net
+                            .mask(
                                 RoundedRectangle(cornerRadius: 20)
-                                    .stroke(
-                                        colorScheme == .dark ? Color.gray.opacity(0.3) : Color.gray.opacity(0.2),
-                                        lineWidth: 1
-                                    )
+                                    .fill(Color.black)
                             )
                     )
                     
                     Spacer()
                 }
+                
+                // Loupe EN DESSOUS comme demandé
+                Button(action: {
+                    performSearch()
+                }) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                }
+                .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                 .animation(.easeInOut(duration: 0.2), value: searchText.isEmpty)
             }
             .padding(.horizontal, 40)
