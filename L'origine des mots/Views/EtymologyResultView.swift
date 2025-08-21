@@ -157,28 +157,8 @@ struct ComposedWordsSection: View {
                     .font(.system(size: 14))
                     .foregroundColor(.secondary)
             } else if componentWords.isEmpty {
-                VStack(spacing: 12) {
-                    Text("Composants détectés :")
-                        .font(.system(size: 16, weight: .light))
-                        .foregroundColor(.secondary)
-                    
-                    ForEach(word.components.indices, id: \.self) { index in
-                        Text("• \(word.components[index])")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.primary)
-                    }
-                    
-                    Text("(Étymologies des composants en cours d'analyse)")
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondary)
-                        .italic()
-                        .padding(.top, 8)
-                }
-                .padding(20)
-                .background(
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(colorScheme == .dark ? Color.gray.opacity(0.1) : Color.gray.opacity(0.05))
-                )
+                // Section supprimée - pas d'affichage pour les composants sans étymologie
+                EmptyView()
             } else {
                 // Affichage des composants avec leurs étymologies
                 ForEach(Array(componentWords.enumerated()), id: \.element.id) { index, componentWord in

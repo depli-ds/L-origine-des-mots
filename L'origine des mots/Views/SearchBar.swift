@@ -37,11 +37,11 @@ struct SearchBar: View {
                             .offset(x: 0, y: 0.5)
                             .mask(RoundedRectangle(cornerRadius: 12))
                     )
-                    .overlay(
-                        // Liseret extérieur
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(.systemGray4), lineWidth: 0.5)
-                    )
+                                         .overlay(
+                         // Liseret extérieur
+                         RoundedRectangle(cornerRadius: 12)
+                             .stroke(Color(.systemGray3), lineWidth: 1.0)
+                     )
                     .shadow(color: .black.opacity(0.03), radius: 2, x: 0, y: 1)
             )
             

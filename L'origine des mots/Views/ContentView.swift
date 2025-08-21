@@ -344,7 +344,7 @@ struct ContentView: View {
                         
                         // Petit espace entre historique et mots remarquables
                         Spacer()
-                            .frame(height: 15)
+                            .frame(height: 8)
                     }
                     
                     RemarkableWordsSection(

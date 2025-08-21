@@ -105,22 +105,8 @@ struct ComposedWordsView: View {
                         ProgressView("Chargement des composants...")
                             .padding(.vertical, 40)
                     } else if componentWords.isEmpty {
-                        VStack(spacing: 16) {
-                            Text("Composants détectés :")
-                                .font(.system(size: 18, weight: .medium))
-                                .foregroundColor(.secondary)
-                            
-                            ForEach(composedWord.components.indices, id: \.self) { index in
-                                Text("• \(composedWord.components[index])")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.primary)
-                            }
-                            
-                            Text("(Composants disponibles sans étymologie détaillée)")
-                                .font(.system(size: 14))
-                                .foregroundColor(.secondary)
-                                .italic()
-                        }
+                        // Section supprimée - pas d'affichage pour les composants sans étymologie
+                        EmptyView()
                         .padding(.vertical, 20)
                     } else {
                         // Affichage de chaque composant avec son étymologie
