@@ -431,18 +431,11 @@ struct ContentView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
-                            .overlay(
-                                // Ombre interne INVERSE de la carte (ombre vers l'intérieur)
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(Color.clear)
-                                    .shadow(
-                                        color: colorScheme == .dark ? .black.opacity(0.8) : .black.opacity(0.15),
-                                        radius: 6,
-                                        x: -3,  // INVERSE: ombre vers la gauche
-                                        y: -3   // INVERSE: ombre vers le haut
-                                    )
-                                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                                    .blendMode(.multiply)
+                            .shadow(
+                                color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
+                                radius: 15,
+                                x: -3,  // INVERSE: ombre vers la gauche
+                                y: -3   // INVERSE: ombre vers le haut
                             )
                     )
                     
