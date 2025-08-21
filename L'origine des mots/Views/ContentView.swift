@@ -219,6 +219,13 @@ struct ContentView: View {
             }
             .onAppear {
                 setupOnAppear()
+                
+                // Connecter le callback de loading pour EtymologyOrchestrator
+                EtymologyOrchestrator.shared.onLoadingStateChange = { newState in
+                    Task { @MainActor in
+                        loadingState = newState
+                    }
+                }
             }
         }
         .sheet(isPresented: etymologySheetBinding) {

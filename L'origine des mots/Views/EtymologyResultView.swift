@@ -33,7 +33,7 @@ struct EtymologyResultView: View {
                 Text(word.word)
                     .font(.system(size: 40, weight: .medium))
                 
-                ForEach(Array(etymology.chain.enumerated()), id: \.element.language) { index, entry in
+                ForEach(Array(etymology.chain.enumerated()), id: \.offset) { index, entry in
                     EtymologyCard(entry: entry)
                     
                     if index < etymology.chain.count - 1 {
@@ -187,7 +187,7 @@ struct ComposedWordsSection: View {
                             .font(.system(size: 18, weight: .medium))
                             .foregroundColor(.primary)
                         
-                        ForEach(Array(componentWord.etymology.chain.enumerated()), id: \.element.language) { cardIndex, entry in
+                        ForEach(Array(componentWord.etymology.chain.enumerated()), id: \.offset) { cardIndex, entry in
                             EtymologyCard(entry: entry)
                             
                             if cardIndex < componentWord.etymology.chain.count - 1 {

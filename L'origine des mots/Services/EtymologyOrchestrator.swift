@@ -25,7 +25,15 @@ class EtymologyOrchestrator {
     private lazy var cnrtlService = CNRTLService.shared
     private lazy var textPreprocessor = TextPreprocessor(knownLanguages: [])
     
+    // Callback pour mettre à jour l'état de loading
+    var onLoadingStateChange: ((LoadingState) -> Void)?
+    
     private init() {}
+    
+    @MainActor
+    private func updateLoadingState(_ state: LoadingState) {
+        onLoadingStateChange?(state)
+    }
     
     /// Orchestration complète : recherche + analyse + sauvegarde
     func processNewWord(_ word: String) async throws -> Word {
@@ -68,11 +76,13 @@ class EtymologyOrchestrator {
         }
         
         // 3. Récupération des langues connues
+        await updateLoadingState(.loadingLanguages)
         print("🗂️ Étape 3: Récupération des langues connues...")
         let knownLanguages = try await SupabaseService.shared.fetchLanguageNames()
         print("✅ \(knownLanguages.count) langues connues chargées")
         
         // 4. Analyse avec Claude (service principal) + fallback GPT
+        await updateLoadingState(.analyzingWithClaude)
         print("🤖 Étape 4: Analyse avec Claude...")
         var etymologyAnalysis: EtymologyAnalysis
         
@@ -80,9 +90,10 @@ class EtymologyOrchestrator {
             etymologyAnalysis = try await ClaudeService.shared.analyzeEtymology(etymologyText, knownLanguages: knownLanguages)
             print("✅ Analyse Claude terminée - \(etymologyAnalysis.etymology.chain.count) étapes étymologiques")
         } catch {
-            print("⚠️ Claude échoué (\(error)), fallback vers GPT-4...")
+            await updateLoadingState(.fallbackToGPT5)
+            print("⚠️ Claude échoué (\(error)), fallback vers GPT-5...")
             
-            // Fallback vers GPT-4
+            // Fallback vers GPT-5
             let gptResponse = try await GPT4Service.shared.analyzeEtymology(etymologyText, knownLanguages: knownLanguages)
             
             // Convertir GPTEtymologyResponse vers EtymologyAnalysis
@@ -92,7 +103,7 @@ class EtymologyOrchestrator {
                 components: nil,        // GPT ne retourne pas ce champ
                 new_languages: []       // GPT ne retourne pas ce champ
             )
-            print("✅ Analyse GPT-4 terminée - \(etymologyAnalysis.etymology.chain.count) étapes étymologiques")
+            print("✅ Analyse GPT-5 terminée - \(etymologyAnalysis.etymology.chain.count) étapes étymologiques")
         }
         
         // 5. Validation : Identifier les mots avec des étymologies trop simples (sans rejeter)
@@ -124,6 +135,7 @@ class EtymologyOrchestrator {
         
         // 6. Gestion des nouvelles langues si nécessaire
         if !etymologyAnalysis.new_languages.isEmpty {
+            await updateLoadingState(.processingNewLanguages(etymologyAnalysis.new_languages.map(\.name)))
             print("🌍 Étape 5: Traitement de \(etymologyAnalysis.new_languages.count) nouvelles langues...")
             await processNewLanguages(etymologyAnalysis.new_languages)
             
@@ -158,7 +170,9 @@ class EtymologyOrchestrator {
         )
         
         // 8. Sauvegarde avec calcul automatique de distance
+        await updateLoadingState(.calculatingDistance)
         print("💾 Étape 7: Sauvegarde avec calcul de distance...")
+        await updateLoadingState(.savingWord)
         let distance = try await SupabaseService.shared.saveWordWithDistance(newWord)
         print("🎉 Mot '\(word)' ajouté avec succès ! Distance: \(String(format: "%.1f", distance)) km")
         
