@@ -29,6 +29,7 @@ struct ContentView: View {
     
     @FocusState private var isSearchFieldFocused: Bool
     @StateObject private var curator = RemarkableWordsCurator.shared
+    @Environment(\.colorScheme) var colorScheme
     
     private func performSearch() {
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
@@ -375,7 +376,7 @@ struct ContentView: View {
                 HStack {
                     Spacer()
                     
-                    // Conteneur du texte et de la croix
+                    // Conteneur du texte et de la croix avec style des cartes
                     HStack(spacing: 4) {
                         // Zone de texte avec placeholder
                         ZStack {
@@ -414,6 +415,15 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(.systemBackground))
+                            .shadow(
+                                color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
+                                radius: 15
+                            )
+                    )
                     
                     Spacer()
                 }
