@@ -25,9 +25,25 @@ struct SearchBar: View {
                     }
                 }
             }
-            .padding(8)
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray6))
+                    .overlay(
+                        // Ombre interne subtile
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.black.opacity(0.08), lineWidth: 1)
+                            .blur(radius: 0.5)
+                            .offset(x: 0, y: 0.5)
+                            .mask(RoundedRectangle(cornerRadius: 12))
+                    )
+                    .overlay(
+                        // Liseret extérieur
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(.systemGray4), lineWidth: 0.5)
+                    )
+                    .shadow(color: .black.opacity(0.03), radius: 2, x: 0, y: 1)
+            )
             
             if isSearching {
                 Button("Annuler") {
