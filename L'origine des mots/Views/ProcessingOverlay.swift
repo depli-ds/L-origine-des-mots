@@ -7,15 +7,18 @@ struct ProcessingOverlay: View {
         VStack {
             RoundedRectangle(cornerRadius: 15)
                 .fill(.ultraThinMaterial)
-                .frame(width: 280, height: 120)
+                .frame(width: 300, height: state.isError ? 160 : 120)
                 .overlay {
                     VStack(spacing: 12) {
-                        ProgressView()
-                            .scaleEffect(1.2)
+                        if !state.isError {
+                            ProgressView()
+                                .scaleEffect(1.2)
+                        }
                         Text(state.message)
-                            .font(.system(size: 16))
+                            .font(.system(size: state.isError ? 15 : 16))
                             .multilineTextAlignment(.center)
-                            .foregroundColor(.primary)
+                            .foregroundColor(state.isError ? .red : .primary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding()
                 }

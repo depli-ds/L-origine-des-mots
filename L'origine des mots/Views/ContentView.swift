@@ -92,12 +92,17 @@ struct ContentView: View {
                     } else if let etymologyError = error as? EtymologyError {
                         loadingState = .error(etymologyError.localizedDescription)
                     } else {
-                        // Vérifier si le message d'erreur indique un mot non trouvé
+                        // Vérifier les types d'erreurs spécifiques
                         let errorMessage = error.localizedDescription.lowercased()
+                        
                         if errorMessage.contains("introuvable") || 
                            errorMessage.contains("non trouvé") ||
                            errorMessage.contains("not found") {
                             loadingState = .error("Aucune correspondance trouvée pour '\(wordToSearch)'")
+                        } else if errorMessage.contains("timed out") || errorMessage.contains("timeout") {
+                            loadingState = .error("⏱️ Délai d'attente dépassé\nClaude et GPT-5 sont temporairement surchargés.\nRéessayez dans quelques minutes.")
+                        } else if errorMessage.contains("overloaded") {
+                            loadingState = .error("🤖 Services IA temporairement surchargés\nRéessayez dans quelques instants.")
                         } else {
                             loadingState = .error("Erreur: \(error.localizedDescription)")
                         }

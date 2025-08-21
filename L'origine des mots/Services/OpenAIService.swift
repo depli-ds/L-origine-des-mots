@@ -22,8 +22,8 @@ class OpenAIService {
         self.apiKey = Configuration.openAIKey
         
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 30  // Plus long car GPT peut prendre du temps
-        config.timeoutIntervalForResource = 60
+        config.timeoutIntervalForRequest = 60  // Augmenté pour GPT-5 et gros prompts
+        config.timeoutIntervalForResource = 120
         config.waitsForConnectivity = true
         
         // Headers par défaut
@@ -101,7 +101,9 @@ class OpenAIService {
                     case .networkConnectionLost, .notConnectedToInternet, .timedOut:
                         print("⚠️ Erreur réseau temporaire (\(urlError.localizedDescription)), tentative \(attempt)/3")
                         if attempt < 3 {
-                            try await Task.sleep(nanoseconds: UInt64(attempt * 1_000_000_000))
+                            // Délais progressifs plus longs pour timeouts
+                            let delay = urlError.code == .timedOut ? attempt * 3 : attempt * 1
+                            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                             continue
                         }
                     default:
