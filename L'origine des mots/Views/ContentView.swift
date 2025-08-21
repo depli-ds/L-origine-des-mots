@@ -414,30 +414,42 @@ struct ContentView: View {
                                     .font(.system(size: 16, weight: .medium))
                             }
                         }
+                        
+                        // Loupe intégrée dans le bloc
+                        Button(action: {
+                            performSearch()
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                        }
+                        .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                     }
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(Color(.systemBackground))
-                            .shadow(
-                                color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
-                                radius: 15
+                            .overlay(
+                                // Ombre interne pour effet creusé
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [
+                                                colorScheme == .dark ? Color.white.opacity(0.2) : Color.black.opacity(0.2),
+                                                Color.clear
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1
+                                    )
+                                    .blur(radius: 1)
                             )
                     )
                     
                     Spacer()
                 }
-                
-                // Loupe de recherche - toujours visible comme bouton de validation
-                Button(action: {
-                    performSearch()
-                }) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-                .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                 .animation(.easeInOut(duration: 0.2), value: searchText.isEmpty)
             }
             .padding(.horizontal, 40)
