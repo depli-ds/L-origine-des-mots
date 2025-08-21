@@ -439,24 +439,22 @@ struct ContentView: View {
                     .padding(.vertical, 20)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(colorScheme == .dark ? Color.black : Color.white)
+                            .fill(
+                                // Fond légèrement plus sombre pour simuler l'enfoncement
+                                colorScheme == .dark 
+                                    ? Color.gray.opacity(0.9) 
+                                    : Color.gray.opacity(0.05)
+                            )
                             .overlay(
-                                // Vrai bouton enfoncé avec contour interne ombré
+                                // Contour plus sombre pour définir les bords
                                 RoundedRectangle(cornerRadius: 20)
                                     .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                (colorScheme == .dark ? Color.white : Color.black).opacity(0.3),
-                                                (colorScheme == .dark ? Color.white : Color.black).opacity(0.1),
-                                                Color.clear,
-                                                Color.clear
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 2
+                                        colorScheme == .dark 
+                                            ? Color.white.opacity(0.1) 
+                                            : Color.black.opacity(0.1),
+                                        lineWidth: 1
                                     )
-                                    .padding(1) // Inset pour effet interne
+                                    .padding(2) // Inset subtil
                             )
                     )
                     
