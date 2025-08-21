@@ -11,8 +11,8 @@ struct ProcessingOverlay: View {
                 .overlay {
                     VStack(spacing: 12) {
                         if !state.isError {
-                            ProgressView()
-                                .scaleEffect(1.2)
+                        ProgressView()
+                            .scaleEffect(1.2)
                         }
                         Text(state.message)
                             .font(.system(size: state.isError ? 15 : 16))

@@ -100,9 +100,9 @@ struct ContentView: View {
                            errorMessage.contains("not found") {
                             loadingState = .error("Aucune correspondance trouvée pour '\(wordToSearch)'")
                         } else if errorMessage.contains("timed out") || errorMessage.contains("timeout") {
-                            loadingState = .error("⏱️ Délai d'attente dépassé\nClaude et GPT-5 sont temporairement surchargés.\nRéessayez dans quelques minutes.")
+                            loadingState = .error("Délai d'attente dépassé\nClaude et GPT-5 sont temporairement surchargés.\nRéessayez dans quelques minutes.")
                         } else if errorMessage.contains("overloaded") {
-                            loadingState = .error("🤖 Services IA temporairement surchargés\nRéessayez dans quelques instants.")
+                            loadingState = .error("Services IA temporairement surchargés\nRéessayez dans quelques instants.")
                         } else {
                             loadingState = .error("Erreur: \(error.localizedDescription)")
                         }

@@ -23,20 +23,20 @@ enum LoadingState: Equatable {
         case .loadingWord:
             return "Recherche du mot..."
         case .searchingCNRTL:
-            return "🔍 Consultation CNRTL.fr..."
+            return "Consultation CNRTL.fr..."
         case .extractingEtymology:
-            return "📝 Extraction des données étymologiques..."
+            return "Extraction des données étymologiques..."
         case .loadingLanguages:
-            return "🗂️ Chargement des langues connues..."
+            return "Chargement des langues connues..."
         case .analyzingWithClaude:
-            return "🤖 Analyse avec Claude IA..."
+            return "Analyse avec Claude IA..."
         case .fallbackToGPT5:
-            return "🔄 Claude surchargé → Basculement GPT-5..."
+            return "Claude surchargé → Basculement GPT-5..."
         case .processingNewLanguages(let languages):
             let count = languages.count
-            return "🌍 Traitement de \(count) nouvelle(s) langue(s)..."
+            return "Traitement de \(count) nouvelle(s) langue(s)..."
         case .calculatingDistance:
-            return "📏 Calcul des distances géographiques..."
+            return "Calcul des distances géographiques..."
         case .analyzingWord:
             return "Analyse étymologique en cours..."
         case .analyzingNewLanguage(let language):
@@ -44,7 +44,7 @@ enum LoadingState: Equatable {
         case .savingNewLanguage(let language):
             return "Sauvegarde de la langue : \(language)"
         case .savingWord:
-            return "💾 Sauvegarde du mot..."
+            return "Sauvegarde du mot..."
         case .error(let message):
             return "Erreur : \(message)"
         }
