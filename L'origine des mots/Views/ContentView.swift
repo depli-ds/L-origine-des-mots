@@ -440,38 +440,11 @@ struct ContentView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
-                            .overlay(
-                                // Vraie ombre interne : double ombre opposée
-                                ZStack {
-                                    // Ombre interne haut-gauche (sombre)
-                                    RoundedRectangle(cornerRadius: 18)
-                                        .fill(Color.clear)
-                                        .shadow(
-                                            color: colorScheme == .dark ? .black.opacity(0.8) : .black.opacity(0.4),
-                                            radius: 6,
-                                            x: 3,
-                                            y: 3
-                                        )
-                                        .mask(
-                                            RoundedRectangle(cornerRadius: 20)
-                                                .fill(Color.black)
-                                        )
-                                    
-                                    // Ombre interne bas-droite (claire)
-                                    RoundedRectangle(cornerRadius: 18)
-                                        .fill(Color.clear)
-                                        .shadow(
-                                            color: colorScheme == .dark ? .white.opacity(0.1) : .white.opacity(0.8),
-                                            radius: 6,
-                                            x: -3,
-                                            y: -3
-                                        )
-                                        .mask(
-                                            RoundedRectangle(cornerRadius: 20)
-                                                .fill(Color.black)
-                                        )
-                                }
-                                .clipped()
+                            .shadow(
+                                color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
+                                radius: 15,
+                                x: -4,  // INVERSÉ: ombre vers la gauche
+                                y: -4   // INVERSÉ: ombre vers le haut
                             )
                     )
                     
