@@ -4,6 +4,7 @@ struct SearchBar: View {
     @Binding var text: String
     @Binding var isSearching: Bool
     let onSubmit: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack {
@@ -29,20 +30,9 @@ struct SearchBar: View {
             .background(
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color(.systemBackground))
-                    .overlay(
-                        // Ombre interne (effet creusé)
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(Color.black.opacity(0.15), lineWidth: 2)
-                            .blur(radius: 3)
-                            .offset(x: 0, y: 2)
-                            .mask(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(LinearGradient(
-                                        colors: [Color.clear, Color.black],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    ))
-                            )
+                    .shadow(
+                        color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
+                        radius: 15
                     )
             )
             
