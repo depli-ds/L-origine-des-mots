@@ -84,7 +84,14 @@ class EtymologyOrchestrator {
             
             // Fallback vers GPT-4
             let gptResponse = try await GPT4Service.shared.analyzeEtymology(etymologyText, knownLanguages: knownLanguages)
-            etymologyAnalysis = gptResponse
+            
+            // Convertir GPTEtymologyResponse vers EtymologyAnalysis
+            etymologyAnalysis = EtymologyAnalysis(
+                etymology: GPTEtymology(chain: gptResponse.etymology.chain),
+                is_composed_word: nil,  // GPT ne retourne pas ce champ
+                components: nil,        // GPT ne retourne pas ce champ
+                new_languages: []       // GPT ne retourne pas ce champ
+            )
             print("✅ Analyse GPT-4 terminée - \(etymologyAnalysis.etymology.chain.count) étapes étymologiques")
         }
         
