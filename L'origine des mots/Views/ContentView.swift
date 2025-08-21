@@ -439,22 +439,39 @@ struct ContentView: View {
                     .padding(.vertical, 20)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(
-                                // Fond légèrement plus sombre pour simuler l'enfoncement
-                                colorScheme == .dark 
-                                    ? Color.gray.opacity(0.9) 
-                                    : Color.gray.opacity(0.05)
-                            )
+                            .fill(colorScheme == .dark ? Color.black : Color.white)
                             .overlay(
-                                // Contour plus sombre pour définir les bords
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(
-                                        colorScheme == .dark 
-                                            ? Color.white.opacity(0.1) 
-                                            : Color.black.opacity(0.1),
-                                        lineWidth: 1
-                                    )
-                                    .padding(2) // Inset subtil
+                                // Vraie ombre interne : double ombre opposée
+                                ZStack {
+                                    // Ombre interne haut-gauche (sombre)
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .fill(Color.clear)
+                                        .shadow(
+                                            color: colorScheme == .dark ? .black.opacity(0.8) : .black.opacity(0.4),
+                                            radius: 6,
+                                            x: 3,
+                                            y: 3
+                                        )
+                                        .mask(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .fill(Color.black)
+                                        )
+                                    
+                                    // Ombre interne bas-droite (claire)
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .fill(Color.clear)
+                                        .shadow(
+                                            color: colorScheme == .dark ? .white.opacity(0.1) : .white.opacity(0.8),
+                                            radius: 6,
+                                            x: -3,
+                                            y: -3
+                                        )
+                                        .mask(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .fill(Color.black)
+                                        )
+                                }
+                                .clipped()
                             )
                     )
                     
