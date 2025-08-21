@@ -438,33 +438,26 @@ struct ContentView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 20)
                     .background(
-                        ZStack {
-                            // Fond principal
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(colorScheme == .dark ? Color.black : Color.white)
-                            
-                            // Ombre interne avec technique mask + inset
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color.clear)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(
-                                            RadialGradient(
-                                                colors: [
-                                                    (colorScheme == .dark ? Color.white : Color.black).opacity(0.15),
-                                                    Color.clear
-                                                ],
-                                                center: .topLeading,
-                                                startRadius: 0,
-                                                endRadius: 80
-                                            )
-                                        )
-                                )
-                                .mask(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(Color.black)
-                                )
-                        }
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(colorScheme == .dark ? Color.black : Color.white)
+                            .overlay(
+                                // Vrai bouton enfoncé avec contour interne ombré
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [
+                                                (colorScheme == .dark ? Color.white : Color.black).opacity(0.3),
+                                                (colorScheme == .dark ? Color.white : Color.black).opacity(0.1),
+                                                Color.clear,
+                                                Color.clear
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 2
+                                    )
+                                    .padding(1) // Inset pour effet interne
+                            )
                     )
                     
                     Spacer()
