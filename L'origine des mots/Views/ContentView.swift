@@ -420,16 +420,19 @@ struct ContentView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
+                    )
+                    .overlay(
+                        // Ombre interne classique avec double contour
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.clear, lineWidth: 1)
                             .shadow(
-                                color: colorScheme == .dark ? .black.opacity(0.3) : .black.opacity(0.2),
-                                radius: 8,
-                                x: 0,
-                                y: 0
+                                color: colorScheme == .dark ? .black.opacity(0.8) : .black.opacity(0.3),
+                                radius: 4,
+                                x: 3,
+                                y: 3
                             )
-                            .mask(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.black)
-                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .blendMode(.multiply)
                     )
                     
                     Spacer()
