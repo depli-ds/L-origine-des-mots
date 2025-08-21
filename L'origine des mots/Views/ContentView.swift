@@ -376,9 +376,54 @@ struct ContentView: View {
                 HStack {
                     Spacer()
                     
-                    // Conteneur du texte avec loupe et X intégrés
-                    HStack(spacing: 12) {
-                        // Loupe À GAUCHE dans le bloc
+                    // Conteneur VERTICAL avec texte en haut et loupe en dessous
+                    VStack(spacing: 16) {
+                        // Zone de texte avec X à droite
+                        HStack {
+                            Spacer()
+                            
+                            // Zone de texte avec placeholder
+                            ZStack {
+                                // Placeholder "Rechercher" quand vide et non focalisé
+                                if !isSearchFieldFocused && searchText.isEmpty {
+                                    Text("Rechercher")
+                                        .font(.system(size: 40, weight: .medium))
+                                        .foregroundColor(.secondary.opacity(0.3))
+                                        .allowsHitTesting(false)
+                                }
+                                
+                                // TextField pour la saisie
+                                TextField("", text: $searchText)
+                                    .focused($isSearchFieldFocused)
+                                    .font(.system(size: 40, weight: .medium))
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                    .autocapitalization(.none)
+                                    .disableAutocorrection(true)
+                                    .onSubmit {
+                                        performSearch()
+                                    }
+                                    .onTapGesture {
+                                        isSearchFieldFocused = true
+                                    }
+                            }
+                            
+                            // Bouton X À DROITE
+                            if !searchText.isEmpty {
+                                Button(action: {
+                                    searchText = ""
+                                }) {
+                                    Image(systemName: "xmark")
+                                        .foregroundColor(.gray.opacity(0.7))
+                                        .font(.system(size: 16, weight: .medium))
+                                }
+                            } else {
+                                Spacer()
+                                    .frame(width: 20) // Espace pour équilibrer même sans X
+                            }
+                        }
+                        
+                        // Loupe EN DESSOUS dans le bloc
                         Button(action: {
                             performSearch()
                         }) {
@@ -389,54 +434,37 @@ struct ContentView: View {
                         .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                         
-                        // Zone de texte avec placeholder
-                        ZStack {
-                            // Placeholder "Rechercher" quand vide et non focalisé
-                            if !isSearchFieldFocused && searchText.isEmpty {
-                                Text("Rechercher")
-                                    .font(.system(size: 40, weight: .medium))
-                                    .foregroundColor(.secondary.opacity(0.3))
-                                    .allowsHitTesting(false)
-                            }
-                            
-                            // TextField pour la saisie
-                            TextField("", text: $searchText)
-                                .focused($isSearchFieldFocused)
-                                .font(.system(size: 40, weight: .medium))
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.center)
-                                .autocapitalization(.none)
-                                .disableAutocorrection(true)
-                                .onSubmit {
-                                    performSearch()
-                                }
-                                .onTapGesture {
-                                    isSearchFieldFocused = true
-                                }
-                        }
-                        
-                        // Bouton X À DROITE
-                        if !searchText.isEmpty {
-                            Button(action: {
-                                searchText = ""
-                            }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.gray.opacity(0.7))
-                                    .font(.system(size: 16, weight: .medium))
-                            }
-                        }
-                        
                     }
-                    .padding(16)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(colorScheme == .dark ? Color.black : Color.white)
-                            .shadow(
-                                color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
-                                radius: 15,
-                                x: -3,  // INVERSE: ombre vers la gauche
-                                y: -3   // INVERSE: ombre vers le haut
-                            )
+                        ZStack {
+                            // Fond principal
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(colorScheme == .dark ? Color.black : Color.white)
+                            
+                            // Ombre interne avec technique mask + inset
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.clear)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(
+                                            RadialGradient(
+                                                colors: [
+                                                    (colorScheme == .dark ? Color.white : Color.black).opacity(0.15),
+                                                    Color.clear
+                                                ],
+                                                center: .topLeading,
+                                                startRadius: 0,
+                                                endRadius: 80
+                                            )
+                                        )
+                                )
+                                .mask(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(Color.black)
+                                )
+                        }
                     )
                     
                     Spacer()
