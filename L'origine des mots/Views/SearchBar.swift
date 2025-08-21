@@ -25,24 +25,25 @@ struct SearchBar: View {
                     }
                 }
             }
-            .padding(12)
+                        .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.systemBackground))
                     .overlay(
-                        // Ombre interne subtile
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black.opacity(0.08), lineWidth: 1)
-                            .blur(radius: 0.5)
-                            .offset(x: 0, y: 0.5)
-                            .mask(RoundedRectangle(cornerRadius: 12))
+                        // Ombre interne (effet creusé)
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.black.opacity(0.15), lineWidth: 2)
+                            .blur(radius: 3)
+                            .offset(x: 0, y: 2)
+                            .mask(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(LinearGradient(
+                                        colors: [Color.clear, Color.black],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ))
+                            )
                     )
-                                         .overlay(
-                         // Liseret extérieur
-                         RoundedRectangle(cornerRadius: 12)
-                             .stroke(Color(.systemGray3), lineWidth: 1.0)
-                     )
-                    .shadow(color: .black.opacity(0.03), radius: 2, x: 0, y: 1)
             )
             
             if isSearching {
