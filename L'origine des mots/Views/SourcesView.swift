@@ -21,11 +21,14 @@ struct SourcesView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     switch context {
                     case .mainWord:
-                        Text("Sources des étymologies :")
+                        // Titre au singulier si une seule source, pluriel sinon
+                        let hasSpecificLink = word?.foundInCNRTL == true
+                        let title = hasSpecificLink ? "Source de l'étymologie :" : "Sources des étymologies :"
+                        Text(title)
                             .font(.headline)
                             .padding(.bottom, 4)
                     case .component:
-                        Text("Sources du composant :")
+                        Text("Source du composant :")
                             .font(.headline)
                             .padding(.bottom, 4)
                     }

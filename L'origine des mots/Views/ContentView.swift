@@ -204,18 +204,13 @@ struct ContentView: View {
                 // Plus de compensation status bar - mode plein écran
                 
                 if loadingState.isLoading {
-                    VStack {
-                        Spacer()
-                        Spacer()
-                        Spacer()  // Beaucoup plus d'espace en haut
-                        ProcessingOverlay(state: loadingState)
-                        Spacer()
-                    }
+                    // Loading parfaitement centré, superposé proprement
+                    ProcessingOverlay(state: loadingState)
                 }
             }
             .navigationTitle("")
             .navigationBarHidden(true)
-            .ignoresSafeArea(.all)  // Mode vraiment plein écran
+            // Respect de la safe area pour éviter de taper dans le menu
             .onTapGesture {
                 // Tap en dehors pour défocaliser
                 if isSearchFieldFocused {
