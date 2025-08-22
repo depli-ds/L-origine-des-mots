@@ -441,8 +441,8 @@ struct ContentView: View {
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
                             .innerShadow(
-                                radius: 12,
-                                opacity: 0.35,
+                                radius: 15,     // MÊME radius que les cartes
+                                opacity: 0.2,   // 2x plus intense pour effet enfoncé
                                 x: 0,
                                 y: 12,
                                 color: colorScheme == .dark ? .white : .black
