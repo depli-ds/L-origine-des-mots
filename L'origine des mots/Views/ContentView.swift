@@ -440,12 +440,22 @@ struct ContentView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
-                            .shadow(.inner(
-                                color: colorScheme == .dark ? .white.opacity(0.2) : .black.opacity(0.2),
-                                radius: 15,
-                                x: 0,
-                                y: 12
-                            ))
+                            .overlay(
+                                // Vraie inner shadow avec technique éprouvée
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(
+                                        RadialGradient(
+                                            gradient: Gradient(colors: [
+                                                (colorScheme == .dark ? Color.white : Color.black).opacity(0.3),
+                                                Color.clear
+                                            ]),
+                                            center: .topLeading,
+                                            startRadius: 5,
+                                            endRadius: 40
+                                        )
+                                    )
+                                    .blendMode(.multiply)
+                            )
                     )
                     
                     Spacer()
