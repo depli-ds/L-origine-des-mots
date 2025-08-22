@@ -365,6 +365,10 @@ struct ContentView: View {
             VStack(spacing: 16) {
                 // Zone de texte centrée avec bouton X en overlay + loading intégré
                 VStack(spacing: 16) {
+                    // Titre au-dessus du champ (comme les cartes)
+                    Text("Chercher un mot :")
+                        .font(.system(size: 16, weight: .light))
+                        .foregroundColor(.secondary)
                     ZStack {
                         // Zone de texte avec X en overlay (vraiment centré)
                         ZStack {
@@ -409,6 +413,7 @@ struct ContentView: View {
                                             .font(.system(size: 20))
                                     }
                                     .contentShape(Circle())  // Zone de tap plus grande
+                                    .alignmentGuide(.firstTextBaseline) { _ in 20 }  // Aligner sur baseline du texte
                                 }
                                 .padding(.trailing, 4)
                             }
@@ -466,7 +471,7 @@ struct ContentView: View {
             }
             .padding(.horizontal, 24)  // MÊME que les cartes : 24px des bords
             .padding(.top, 24)      // MÊME espace qu'horizontal pour uniformité
-            .padding(.bottom, 12)   // Espace réduit pour remonter historique
+            .padding(.bottom, 4)    // Espace vraiment réduit pour remonter historique
             .ignoresSafeArea(.keyboard)  // Ignorer le clavier
         }
     }

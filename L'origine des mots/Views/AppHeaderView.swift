@@ -11,7 +11,7 @@ struct AppHeaderView: View {
                 .padding(.leading, 8)
             Spacer()
         }
-        .padding(.top, 5)
+        .padding(.top, 24)    // Même espace que les côtés
         .padding(.bottom, 20)
         .background(Color(.systemBackground))
     }
