@@ -2,19 +2,33 @@ import SwiftUI
 
 struct SourcesView: View {
     let word: Word?
+    let context: SourceContext
     @Environment(\.dismiss) private var dismiss
     
-    init(word: Word? = nil) {
+    enum SourceContext {
+        case mainWord        // Mot principal
+        case component       // Composant d'un mot composé
+    }
+    
+    init(word: Word? = nil, context: SourceContext = .mainWord) {
         self.word = word
+        self.context = context
     }
     
     var body: some View {
         NavigationStack {
             List {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Sources des étymologies :")
-                        .font(.headline)
-                        .padding(.bottom, 4)
+                    switch context {
+                    case .mainWord:
+                        Text("Sources des étymologies :")
+                            .font(.headline)
+                            .padding(.bottom, 4)
+                    case .component:
+                        Text("Sources du composant :")
+                            .font(.headline)
+                            .padding(.bottom, 4)
+                    }
                     
                     // Lien spécifique au mot si fourni ET trouvé dans CNRTL
                     if let word = word, word.foundInCNRTL {
@@ -25,12 +39,20 @@ struct SourcesView: View {
                             .padding(.bottom, 8)
                     }
                     
-                    // Message pour les composants virtuels
+                    // Messages contextuels
                     if let word = word, !word.foundInCNRTL && word.source == "Analyse composée" {
-                        Text("• Composant virtuel analysé spécifiquement pour ce mot composé")
-                            .foregroundColor(.orange)
-                            .font(.system(size: 16))
-                            .padding(.bottom, 8)
+                        switch context {
+                        case .mainWord:
+                            Text("• Mot analysé via décomposition étymologique")
+                                .foregroundColor(.orange)
+                                .font(.system(size: 16))
+                                .padding(.bottom, 8)
+                        case .component:
+                            Text("• Composant virtuel créé pour l'analyse du mot parent")
+                                .foregroundColor(.orange)
+                                .font(.system(size: 16))
+                                .padding(.bottom, 8)
+                        }
                     }
                     
                     Link("• CNRTL - Centre National de Ressources Textuelles et Lexicales", 

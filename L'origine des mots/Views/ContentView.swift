@@ -201,22 +201,20 @@ struct ContentView: View {
             ZStack {
                 mainScrollView
                 
-                // Calque opaque fixe pour status bar (au-dessus du scroll)
-                VStack {
-                    Rectangle()
-                        .fill(Color(.systemBackground))
-                        .frame(height: 20)
-                        .ignoresSafeArea(edges: .top)
-                    Spacer()
-                }
-                .allowsHitTesting(false)
+                // Plus de compensation status bar - mode plein écran
                 
                 if loadingState.isLoading {
-                    ProcessingOverlay(state: loadingState)
+                    VStack {
+                        Spacer()
+                        ProcessingOverlay(state: loadingState)
+                        Spacer()
+                        Spacer()  // Décale vers le bas pour ne pas recouvrir le mot
+                    }
                 }
             }
             .navigationTitle("")
             .navigationBarHidden(true)
+            .statusBarHidden(true)  // Cache la barre de statut
             .onTapGesture {
                 // Tap en dehors pour défocaliser
                 if isSearchFieldFocused {

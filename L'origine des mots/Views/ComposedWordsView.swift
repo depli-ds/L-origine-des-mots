@@ -200,7 +200,7 @@ struct ComposedWordsView: View {
             }
             .sheet(isPresented: $showingSources) {
                 if let selectedWord = selectedWordForSources {
-                    SourcesView(word: selectedWord)
+                    SourcesView(word: selectedWord, context: .component)
                 }
             }
             .onAppear {

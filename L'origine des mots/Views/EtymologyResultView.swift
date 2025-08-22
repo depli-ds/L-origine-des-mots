@@ -84,7 +84,7 @@ struct EtymologyResultView: View {
             EtymologyMapView(word: word)
         }
         .sheet(isPresented: $showingSources) {
-            SourcesView(word: word)
+            SourcesView(word: word, context: .mainWord)
         }
     }
 }
