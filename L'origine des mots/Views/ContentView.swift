@@ -334,9 +334,9 @@ struct ContentView: View {
                             }
                         )
                         
-                        // Petit espace entre historique et mots remarquables
+                        // Espace minimal entre historique et mots remarquables
                         Spacer()
-                            .frame(height: 8)
+                            .frame(height: 4)
                     }
                     
                     RemarkableWordsSection(
@@ -362,7 +362,7 @@ struct ContentView: View {
     
     private var searchSection: some View {
         VStack(spacing: 8) {   // Réduit l'espace pour remonter historique
-            VStack(spacing: 16) {
+            VStack(spacing: 8) {   // Titre très proche du bloc
                 // Titre en dehors du bloc (comme "Origine du mot:")
                 Text("Chercher un mot :")
                     .font(.system(size: 16, weight: .light))
@@ -379,7 +379,7 @@ struct ContentView: View {
                                 if !isSearchFieldFocused && searchText.isEmpty && !loadingState.isLoading {
                                     Text("Rechercher")
                                         .font(.system(size: 40, weight: .light))
-                                        .foregroundColor(.secondary.opacity(0.3))
+                                        .foregroundColor(.secondary.opacity(0.6))  // Meilleur contraste WCAG
                                         .allowsHitTesting(false)
                                 }
                                 
@@ -411,12 +411,12 @@ struct ContentView: View {
                                     }) {
                                         Image(systemName: "xmark.circle.fill")
                                             .foregroundColor(.gray.opacity(0.6))
-                                            .font(.system(size: 20))
+                                            .font(.system(size: 18))  // Plus petit pour meilleur alignement
                                     }
                                     .contentShape(Circle())  // Zone de tap plus grande
-                                    .alignmentGuide(.firstTextBaseline) { _ in 20 }  // Aligner sur baseline du texte
+                                    .offset(y: -2)  // Descendre légèrement pour aligner sur hauteur d'x
                                 }
-                                .padding(.trailing, 4)
+                                .padding(.trailing, 6)
                             }
                         }
                         
