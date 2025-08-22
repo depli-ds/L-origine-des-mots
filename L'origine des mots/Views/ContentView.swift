@@ -361,7 +361,7 @@ struct ContentView: View {
     }
     
     private var searchSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 8) {   // Réduit l'espace pour remonter historique
             VStack(spacing: 16) {
                 // Zone de texte centrée avec bouton X en overlay + loading intégré
                 VStack(spacing: 16) {
@@ -414,35 +414,40 @@ struct ContentView: View {
                             }
                         }
                         
-                        // Loading dans le bloc de recherche (même taille)
-                        if loadingState.isLoading {
-                            HStack(spacing: 12) {
-                                ProgressView()
-                                    .scaleEffect(0.8)
-                                Text(loadingState.message)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                            }
-                        }
                     }
                         
-                    // Loupe EN DESSOUS dans le bloc
-                    if !loadingState.isLoading {
-                        Button(action: {
-                            performSearch()
-                        }) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.title2)
-                                .foregroundColor(.secondary)
+                    // Zone fixe pour loupe OU loading (hauteur constante)
+                    ZStack {
+                        if loadingState.isLoading {
+                            // Loading à la place de la loupe
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                    .scaleEffect(0.9)
+                                Text(loadingState.message)
+                                    .font(.system(size: 15))
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            .frame(height: 32)  // Hauteur fixe
+                        } else {
+                            // Loupe quand pas de loading
+                            Button(action: {
+                                performSearch()
+                            }) {
+                                Image(systemName: "magnifyingglass")
+                                    .font(.title2)
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(height: 32)  // Même hauteur fixe
+                            .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                            .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                         }
-                        .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                     }
                         
                 }
                 .padding(.horizontal, 20)  // MÊME padding interne que les cartes
-                .padding(.vertical, 24)    // MÊME que les cartes pour proportions
+                .padding(.vertical, 32)    // Plus haut que les cartes pour intégrer loading
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(
@@ -460,8 +465,8 @@ struct ContentView: View {
 
             }
             .padding(.horizontal, 24)  // MÊME que les cartes : 24px des bords
-            .padding(.top, 8)       // Moins d'espace en haut
-            .padding(.bottom, 16)   // Moins d'espace en bas
+            .padding(.top, 24)      // MÊME espace qu'horizontal pour uniformité
+            .padding(.bottom, 12)   // Espace réduit pour remonter historique
             .ignoresSafeArea(.keyboard)  // Ignorer le clavier
         }
     }
