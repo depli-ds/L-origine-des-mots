@@ -378,16 +378,14 @@ struct ContentView: View {
                     
                     // Conteneur VERTICAL avec texte en haut et loupe en dessous
                     VStack(spacing: 16) {
-                        // Zone de texte avec X à droite
+                        // Zone de texte avec X à droite  
                         HStack {
-                            Spacer()
-                            
-                            // Zone de texte avec placeholder
+                            // Zone de texte avec placeholder (CENTRÉE)
                             ZStack {
                                 // Placeholder "Rechercher" quand vide et non focalisé
                                 if !isSearchFieldFocused && searchText.isEmpty {
                                     Text("Rechercher")
-                                        .font(.system(size: 40, weight: .medium))
+                                        .font(.system(size: 40, weight: .light))  // Plus fine comme les cartes
                                         .foregroundColor(.secondary.opacity(0.3))
                                         .allowsHitTesting(false)
                                 }
@@ -395,7 +393,7 @@ struct ContentView: View {
                                 // TextField pour la saisie
                                 TextField("", text: $searchText)
                                     .focused($isSearchFieldFocused)
-                                    .font(.system(size: 40, weight: .medium))
+                                    .font(.system(size: 40, weight: .light))  // Plus fine comme les cartes
                                     .foregroundColor(.primary)
                                     .multilineTextAlignment(.center)
                                     .autocapitalization(.none)
@@ -407,8 +405,9 @@ struct ContentView: View {
                                         isSearchFieldFocused = true
                                     }
                             }
+                            .frame(maxWidth: .infinity)  // Prend tout l'espace disponible
                             
-                            // Bouton X À DROITE
+                            // Bouton X À DROITE (en overlay pour ne pas décaler)
                             if !searchText.isEmpty {
                                 Button(action: {
                                     searchText = ""
@@ -417,9 +416,7 @@ struct ContentView: View {
                                         .foregroundColor(.gray.opacity(0.7))
                                         .font(.system(size: 16, weight: .medium))
                                 }
-                            } else {
-                                Spacer()
-                                    .frame(width: 20) // Espace pour équilibrer même sans X
+                                .offset(x: -8)  // Léger décalage vers la gauche
                             }
                         }
                         
