@@ -206,15 +206,16 @@ struct ContentView: View {
                 if loadingState.isLoading {
                     VStack {
                         Spacer()
+                        Spacer()
+                        Spacer()  // Beaucoup plus d'espace en haut
                         ProcessingOverlay(state: loadingState)
                         Spacer()
-                        Spacer()  // Décale vers le bas pour ne pas recouvrir le mot
                     }
                 }
             }
             .navigationTitle("")
             .navigationBarHidden(true)
-            .statusBarHidden(true)  // Cache la barre de statut
+            .statusBarHidden()  // Approche plus compatible
             .onTapGesture {
                 // Tap en dehors pour défocaliser
                 if isSearchFieldFocused {
@@ -372,9 +373,9 @@ struct ContentView: View {
             VStack(spacing: 16) {
                 // Zone de texte centrée avec bouton X en overlay
                 VStack(spacing: 16) {
-                    // Zone de texte avec X en overlay pour ne PAS décaler
-                    ZStack {
-                        // TextField parfaitement centré
+                    // Zone de texte avec X à droite (approach HStack simple)
+                    HStack {
+                        // TextField centré dans un Spacer
                         ZStack {
                             // Placeholder "Rechercher" quand vide et non focalisé
                             if !isSearchFieldFocused && searchText.isEmpty {
@@ -399,20 +400,22 @@ struct ContentView: View {
                                     isSearchFieldFocused = true
                                 }
                         }
+                        .frame(maxWidth: .infinity)
                         
-                        // Bouton X en overlay (ne décale RIEN)
+                        // Bouton X fixe à droite
                         if !searchText.isEmpty {
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    searchText = ""
-                                }) {
-                                    Image(systemName: "xmark")
-                                        .foregroundColor(.gray.opacity(0.7))
-                                        .font(.system(size: 16, weight: .medium))
-                                }
-                                .padding(.trailing, 8)  // Marge du bord droit
+                            Button(action: {
+                                searchText = ""
+                            }) {
+                                Image(systemName: "xmark")
+                                    .foregroundColor(.gray.opacity(0.7))
+                                    .font(.system(size: 16, weight: .medium))
                             }
+                            .frame(width: 24, height: 24)
+                        } else {
+                            // Spacer invisible pour maintenir l'alignement
+                            Spacer()
+                                .frame(width: 24, height: 24)
                         }
                     }
                         
