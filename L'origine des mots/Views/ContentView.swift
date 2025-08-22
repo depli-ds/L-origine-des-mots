@@ -440,13 +440,12 @@ struct ContentView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
-                            .innerShadow(
-                                radius: 15,     // MÊME radius que les cartes
-                                opacity: 0.2,   // 2x plus intense pour effet enfoncé
+                            .shadow(.inner(
+                                color: colorScheme == .dark ? .white.opacity(0.2) : .black.opacity(0.2),
+                                radius: 15,
                                 x: 0,
-                                y: 12,
-                                color: colorScheme == .dark ? .white : .black
-                            )
+                                y: 12
+                            ))
                     )
                     
                     Spacer()
