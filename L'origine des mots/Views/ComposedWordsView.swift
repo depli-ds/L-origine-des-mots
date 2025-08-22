@@ -26,9 +26,16 @@ struct ComposedWordsView: View {
                     // En-tête 
                     HStack {
                         Spacer()
-                        Text("\(composedWord.components.count) origines pour le mot :")
-                            .font(.system(size: 16, weight: .light))
-                            .foregroundColor(.secondary)
+                        // Titre adapté selon le type de mot
+                        if isBorrowedComposition {
+                            Text("Origine du mot :")
+                                .font(.system(size: 16, weight: .light))
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("\(composedWord.components.count) composants du mot :")
+                                .font(.system(size: 16, weight: .light))
+                                .foregroundColor(.secondary)
+                        }
                         Spacer()
                         Button(action: { 
                             dismiss()
