@@ -307,16 +307,16 @@ struct ContentView: View {
                 VStack(spacing: 0) {
                     AppHeaderView()
                     
-                    // Spacer pour centrer verticalement le champ de recherche
+                    // Spacer pour centrer le champ de recherche (réduit)
                     Spacer()
-                        .frame(height: max(60, (geometry.size.height - 200) / 3))
+                        .frame(height: max(40, (geometry.size.height - 400) / 4))
                     
                     // Champ de recherche centré verticalement
                     searchSection
                     
-                    // Grand espace avant l'historique et les mots remarquables
+                    // Espace modéré avant l'historique  
                     Spacer()
-                        .frame(height: max(60, (geometry.size.height - 200) / 3))
+                        .frame(height: max(40, (geometry.size.height - 400) / 6))
                     
                     if !searchHistory.isEmpty {
                         RecentSearchesView(
@@ -363,12 +363,13 @@ struct ContentView: View {
     private var searchSection: some View {
         VStack(spacing: 8) {   // Réduit l'espace pour remonter historique
             VStack(spacing: 16) {
+                // Titre en dehors du bloc (comme "Origine du mot:")
+                Text("Chercher un mot :")
+                    .font(.system(size: 16, weight: .light))
+                    .foregroundColor(.secondary)
+                
                 // Zone de texte centrée avec bouton X en overlay + loading intégré
                 VStack(spacing: 16) {
-                    // Titre au-dessus du champ (comme les cartes)
-                    Text("Chercher un mot :")
-                        .font(.system(size: 16, weight: .light))
-                        .foregroundColor(.secondary)
                     ZStack {
                         // Zone de texte avec X en overlay (vraiment centré)
                         ZStack {
