@@ -334,9 +334,9 @@ struct ContentView: View {
                             }
                         )
                         
-                        // Espace minimal entre historique et mots remarquables
+                        // Espace équilibré entre historique et mots remarquables
                         Spacer()
-                            .frame(height: 4)
+                            .frame(height: 16)
                     }
                     
                     RemarkableWordsSection(
@@ -362,7 +362,7 @@ struct ContentView: View {
     
     private var searchSection: some View {
         VStack(spacing: 8) {   // Réduit l'espace pour remonter historique
-            VStack(spacing: 8) {   // Titre très proche du bloc
+            VStack(spacing: 12) {   // Titre légèrement plus haut
                 // Titre en dehors du bloc (comme "Origine du mot:")
                 Text("Chercher un mot :")
                     .font(.system(size: 16, weight: .light))
@@ -448,7 +448,7 @@ struct ContentView: View {
                             }
                             .frame(height: 32)  // Même hauteur fixe
                             .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                            .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
+                            // Pas d'opacity supplémentaire pour garder bon contraste
                         }
                     }
                         
