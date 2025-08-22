@@ -439,32 +439,14 @@ struct ContentView: View {
                     .padding(.vertical, 20)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(colorScheme == .dark ? Color.black : Color.white)
-                            .overlay(
-                                // Double inner shadow technique éprouvée
-                                ZStack {
-                                    // Ombre sombre (haut-gauche)
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(colorScheme == .dark ? Color.white.opacity(0.3) : Color.black.opacity(0.3), lineWidth: 1)
-                                        .blur(radius: 4)
-                                        .offset(x: -2, y: -2)
-                                        .mask(RoundedRectangle(cornerRadius: 20).fill(LinearGradient(
-                                            gradient: Gradient(colors: [Color.black, Color.clear]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )))
-                                    
-                                    // Ombre claire (bas-droite) 
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(colorScheme == .dark ? Color.black.opacity(0.3) : Color.white.opacity(0.3), lineWidth: 1)
-                                        .blur(radius: 4)
-                                        .offset(x: 2, y: 2)
-                                        .mask(RoundedRectangle(cornerRadius: 20).fill(LinearGradient(
-                                            gradient: Gradient(colors: [Color.clear, Color.black]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )))
-                                }
+                            .fill(
+                                (colorScheme == .dark ? Color.black : Color.white)
+                                    .shadow(.inner(
+                                        color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
+                                        radius: 15,  // MÊME radius que les cartes
+                                        x: 0,
+                                        y: 8
+                                    ))
                             )
                     )
                     
