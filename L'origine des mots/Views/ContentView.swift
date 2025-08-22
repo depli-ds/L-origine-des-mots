@@ -203,10 +203,7 @@ struct ContentView: View {
                 
                 // Plus de compensation status bar - mode plein écran
                 
-                if loadingState.isLoading {
-                    // Loading parfaitement centré, superposé proprement
-                    ProcessingOverlay(state: loadingState)
-                }
+                // Loading maintenant intégré dans le bloc de recherche
             }
             .navigationTitle("")
             .navigationBarHidden(true)
@@ -366,54 +363,72 @@ struct ContentView: View {
     private var searchSection: some View {
         VStack(spacing: 20) {
             VStack(spacing: 16) {
-                // Zone de texte centrée avec bouton X en overlay
+                // Zone de texte centrée avec bouton X en overlay + loading intégré
                 VStack(spacing: 16) {
-                    // Zone de texte avec X en overlay (vraiment centré)
                     ZStack {
-                        // TextField parfaitement centré (prend toute la largeur)
+                        // Zone de texte avec X en overlay (vraiment centré)
                         ZStack {
-                            // Placeholder "Rechercher" quand vide et non focalisé
-                            if !isSearchFieldFocused && searchText.isEmpty {
-                                Text("Rechercher")
+                            // TextField parfaitement centré (prend toute la largeur)
+                            ZStack {
+                                // Placeholder "Rechercher" quand vide et non focalisé
+                                if !isSearchFieldFocused && searchText.isEmpty && !loadingState.isLoading {
+                                    Text("Rechercher")
+                                        .font(.system(size: 40, weight: .light))
+                                        .foregroundColor(.secondary.opacity(0.3))
+                                        .allowsHitTesting(false)
+                                }
+                                
+                                // TextField pour la saisie
+                                TextField("", text: $searchText)
+                                    .focused($isSearchFieldFocused)
                                     .font(.system(size: 40, weight: .light))
-                                    .foregroundColor(.secondary.opacity(0.3))
-                                    .allowsHitTesting(false)
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                    .autocapitalization(.none)
+                                    .disableAutocorrection(true)
+                                    .disabled(loadingState.isLoading)  // Désactiver pendant loading
+                                    .onSubmit {
+                                        performSearch()
+                                    }
+                                    .onTapGesture {
+                                        if !loadingState.isLoading {
+                                            isSearchFieldFocused = true
+                                        }
+                                    }
                             }
                             
-                            // TextField pour la saisie
-                            TextField("", text: $searchText)
-                                .focused($isSearchFieldFocused)
-                                .font(.system(size: 40, weight: .light))
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.center)
-                                .autocapitalization(.none)
-                                .disableAutocorrection(true)
-                                .onSubmit {
-                                    performSearch()
+                            // Bouton X en overlay absolu (ne décale RIEN)
+                            if !searchText.isEmpty && !loadingState.isLoading {
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        searchText = ""
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.gray.opacity(0.6))
+                                            .font(.system(size: 20))
+                                    }
+                                    .contentShape(Circle())  // Zone de tap plus grande
                                 }
-                                .onTapGesture {
-                                    isSearchFieldFocused = true
-                                }
+                                .padding(.trailing, 4)
+                            }
                         }
                         
-                        // Bouton X en overlay absolu (ne décale RIEN)
-                        if !searchText.isEmpty {
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    searchText = ""
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.gray.opacity(0.6))
-                                        .font(.system(size: 20))
-                                }
-                                .contentShape(Circle())  // Zone de tap plus grande
+                        // Loading dans le bloc de recherche (même taille)
+                        if loadingState.isLoading {
+                            HStack(spacing: 12) {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text(loadingState.message)
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
                             }
-                            .padding(.trailing, 4)
                         }
                     }
                         
-                        // Loupe EN DESSOUS dans le bloc
+                    // Loupe EN DESSOUS dans le bloc
+                    if !loadingState.isLoading {
                         Button(action: {
                             performSearch()
                         }) {
@@ -423,10 +438,11 @@ struct ContentView: View {
                         }
                         .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
+                    }
                         
                 }
                 .padding(.horizontal, 20)  // MÊME padding interne que les cartes
-                .padding(.vertical, 20)
+                .padding(.vertical, 24)    // MÊME que les cartes pour proportions
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(
@@ -444,8 +460,9 @@ struct ContentView: View {
 
             }
             .padding(.horizontal, 24)  // MÊME que les cartes : 24px des bords
-            .padding(.top, 16)
-            .padding(.bottom, 32)
+            .padding(.top, 8)       // Moins d'espace en haut
+            .padding(.bottom, 16)   // Moins d'espace en bas
+            .ignoresSafeArea(.keyboard)  // Ignorer le clavier
         }
     }
     

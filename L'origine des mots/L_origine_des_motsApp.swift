@@ -24,6 +24,8 @@ struct L_origine_des_motsApp: App {
                 }
             }
             .animation(.easeInOut(duration: 0.5), value: isInitializing)
+            .preferredColorScheme(nil)
+            .statusBarHidden(true)  // Configuration globale
             .onAppear {
                 initializeApp()
             }
