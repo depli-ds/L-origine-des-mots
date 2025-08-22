@@ -372,43 +372,40 @@ struct ContentView: View {
     private var searchSection: some View {
         VStack(spacing: 20) {
             VStack(spacing: 16) {
-                // Zone de texte centrée avec bouton X intégré
-                HStack {
-                    Spacer()
-                    
-                    // Conteneur VERTICAL avec texte en haut et loupe en dessous
-                    VStack(spacing: 16) {
-                        // Zone de texte avec X à droite  
-                        HStack {
-                            // Zone de texte avec placeholder (CENTRÉE)
-                            ZStack {
-                                // Placeholder "Rechercher" quand vide et non focalisé
-                                if !isSearchFieldFocused && searchText.isEmpty {
-                                    Text("Rechercher")
-                                        .font(.system(size: 40, weight: .light))  // Plus fine comme les cartes
-                                        .foregroundColor(.secondary.opacity(0.3))
-                                        .allowsHitTesting(false)
-                                }
-                                
-                                // TextField pour la saisie
-                                TextField("", text: $searchText)
-                                    .focused($isSearchFieldFocused)
-                                    .font(.system(size: 40, weight: .light))  // Plus fine comme les cartes
-                                    .foregroundColor(.primary)
-                                    .multilineTextAlignment(.center)
-                                    .autocapitalization(.none)
-                                    .disableAutocorrection(true)
-                                    .onSubmit {
-                                        performSearch()
-                                    }
-                                    .onTapGesture {
-                                        isSearchFieldFocused = true
-                                    }
+                // Zone de texte centrée avec bouton X en overlay
+                VStack(spacing: 16) {
+                    // Zone de texte avec X en overlay pour ne PAS décaler
+                    ZStack {
+                        // TextField parfaitement centré
+                        ZStack {
+                            // Placeholder "Rechercher" quand vide et non focalisé
+                            if !isSearchFieldFocused && searchText.isEmpty {
+                                Text("Rechercher")
+                                    .font(.system(size: 40, weight: .light))
+                                    .foregroundColor(.secondary.opacity(0.3))
+                                    .allowsHitTesting(false)
                             }
-                            .frame(maxWidth: .infinity)  // Prend tout l'espace disponible
                             
-                            // Bouton X À DROITE (en overlay pour ne pas décaler)
-                            if !searchText.isEmpty {
+                            // TextField pour la saisie
+                            TextField("", text: $searchText)
+                                .focused($isSearchFieldFocused)
+                                .font(.system(size: 40, weight: .light))
+                                .foregroundColor(.primary)
+                                .multilineTextAlignment(.center)
+                                .autocapitalization(.none)
+                                .disableAutocorrection(true)
+                                .onSubmit {
+                                    performSearch()
+                                }
+                                .onTapGesture {
+                                    isSearchFieldFocused = true
+                                }
+                        }
+                        
+                        // Bouton X en overlay (ne décale RIEN)
+                        if !searchText.isEmpty {
+                            HStack {
+                                Spacer()
                                 Button(action: {
                                     searchText = ""
                                 }) {
@@ -416,9 +413,10 @@ struct ContentView: View {
                                         .foregroundColor(.gray.opacity(0.7))
                                         .font(.system(size: 16, weight: .medium))
                                 }
-                                .offset(x: -8)  // Léger décalage vers la gauche
+                                .padding(.trailing, 8)  // Marge du bord droit
                             }
                         }
+                    }
                         
                         // Loupe EN DESSOUS dans le bloc
                         Button(action: {
@@ -431,24 +429,23 @@ struct ContentView: View {
                         .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                         
-                    }
-                    .padding(.horizontal, 20)  // MÊME padding interne que les cartes
-                    .padding(.vertical, 20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(
-                                (colorScheme == .dark ? Color.black : Color.white)
-                                    .shadow(.inner(
-                                        color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
-                                        radius: 15,  // MÊME radius que les cartes
-                                        x: 0,
-                                        y: 8
-                                    ))
-                            )
-                    )
-                    
-                    Spacer()
                 }
+                .padding(.horizontal, 20)  // MÊME padding interne que les cartes
+                .padding(.vertical, 20)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            (colorScheme == .dark ? Color.black : Color.white)
+                                .shadow(.inner(
+                                    color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
+                                    radius: 15,  // MÊME radius que les cartes
+                                    x: 0,
+                                    y: 8
+                                ))
+                        )
+                )
+                
+                Spacer()
 
             }
             .padding(.horizontal, 24)  // MÊME que les cartes : 24px des bords
