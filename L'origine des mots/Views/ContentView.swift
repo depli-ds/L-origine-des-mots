@@ -454,7 +454,7 @@ struct ContentView: View {
                 }
 
             }
-            .padding(.horizontal, 40)
+            .padding(.horizontal, 24)  // MÊME que les cartes : 24px des bords
             .padding(.top, 16)
             .padding(.bottom, 32)
         }
