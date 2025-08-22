@@ -440,11 +440,12 @@ struct ContentView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
-                            .shadow(
-                                color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
-                                radius: 15,
-                                x: -4,  // INVERSÉ: ombre vers la gauche
-                                y: -4   // INVERSÉ: ombre vers le haut
+                            .innerShadow(
+                                radius: 12,
+                                opacity: 0.35,
+                                x: 0,
+                                y: 12,
+                                color: colorScheme == .dark ? .white : .black
                             )
                     )
                     
