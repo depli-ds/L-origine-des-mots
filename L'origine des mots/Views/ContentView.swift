@@ -413,8 +413,9 @@ struct ContentView: View {
                                             .foregroundColor(.gray.opacity(0.6))
                                             .font(.system(size: 18))  // Plus petit pour meilleur alignement
                                     }
-                                    .contentShape(Circle())  // Zone de tap plus grande
-                                    .offset(y: -2)  // Descendre légèrement pour aligner sur hauteur d'x
+                                    .frame(width: 44, height: 44)  // Zone de tap recommandée Apple (44pt)
+                                    .contentShape(Rectangle())  // Zone de tap rectangulaire plus grande
+                                    .offset(y: 2)  // Descendre pour aligner en bout de ligne
                                 }
                                 .padding(.trailing, 6)
                             }
@@ -443,7 +444,7 @@ struct ContentView: View {
                             }) {
                                 Image(systemName: "magnifyingglass")
                                     .font(.title2)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.secondary.opacity(0.6))  // Même gris que placeholder
                             }
                             .frame(height: 32)  // Même hauteur fixe
                             .disabled(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -466,6 +467,7 @@ struct ContentView: View {
                                 ))
                         )
                 )
+                .ignoresSafeArea(.keyboard)  // Bloc fixe quand clavier apparaît
                 
                 Spacer()
 
@@ -473,7 +475,6 @@ struct ContentView: View {
             .padding(.horizontal, 24)  // MÊME que les cartes : 24px des bords
             .padding(.top, 24)      // MÊME espace qu'horizontal pour uniformité
             .padding(.bottom, 4)    // Espace vraiment réduit pour remonter historique
-            .ignoresSafeArea(.keyboard)  // Ignorer le clavier
         }
     }
     

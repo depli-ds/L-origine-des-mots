@@ -40,7 +40,7 @@ struct RecentSearchesView: View {
             }
         }
         .padding(.horizontal)
-        .padding(.bottom, 40)
+        .padding(.bottom, 2)  // Espace minimal divisé par 20 !
     }
 }
 
