@@ -441,20 +441,30 @@ struct ContentView: View {
                         RoundedRectangle(cornerRadius: 20)
                             .fill(colorScheme == .dark ? Color.black : Color.white)
                             .overlay(
-                                // Vraie inner shadow avec technique éprouvée
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(
-                                        RadialGradient(
-                                            gradient: Gradient(colors: [
-                                                (colorScheme == .dark ? Color.white : Color.black).opacity(0.3),
-                                                Color.clear
-                                            ]),
-                                            center: .topLeading,
-                                            startRadius: 5,
-                                            endRadius: 40
-                                        )
-                                    )
-                                    .blendMode(.multiply)
+                                // Double inner shadow technique éprouvée
+                                ZStack {
+                                    // Ombre sombre (haut-gauche)
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(colorScheme == .dark ? Color.white.opacity(0.3) : Color.black.opacity(0.3), lineWidth: 1)
+                                        .blur(radius: 4)
+                                        .offset(x: -2, y: -2)
+                                        .mask(RoundedRectangle(cornerRadius: 20).fill(LinearGradient(
+                                            gradient: Gradient(colors: [Color.black, Color.clear]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )))
+                                    
+                                    // Ombre claire (bas-droite) 
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(colorScheme == .dark ? Color.black.opacity(0.3) : Color.white.opacity(0.3), lineWidth: 1)
+                                        .blur(radius: 4)
+                                        .offset(x: 2, y: 2)
+                                        .mask(RoundedRectangle(cornerRadius: 20).fill(LinearGradient(
+                                            gradient: Gradient(colors: [Color.clear, Color.black]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )))
+                                }
                             )
                     )
                     
