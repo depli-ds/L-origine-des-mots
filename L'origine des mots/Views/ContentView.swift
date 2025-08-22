@@ -432,7 +432,7 @@ struct ContentView: View {
                         .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
                         
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)  // MÊME padding interne que les cartes
                     .padding(.vertical, 20)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
