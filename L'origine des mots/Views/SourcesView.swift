@@ -55,10 +55,13 @@ struct SourcesView: View {
                         }
                     }
                     
-                    Link("• CNRTL - Centre National de Ressources Textuelles et Lexicales", 
-                         destination: URL(string: "https://www.cnrtl.fr")!)
-                        .foregroundColor(.blue)
-                        .font(.system(size: 16))
+                    // Lien général CNRTL seulement si pas de lien spécifique
+                    if word?.foundInCNRTL != true {
+                        Link("• CNRTL - Centre National de Ressources Textuelles et Lexicales", 
+                             destination: URL(string: "https://www.cnrtl.fr")!)
+                            .foregroundColor(.blue)
+                            .font(.system(size: 16))
+                    }
                     
                     Text("Les étymologies sont recherchées automatiquement dans cette source académique.")
                         .font(.caption)

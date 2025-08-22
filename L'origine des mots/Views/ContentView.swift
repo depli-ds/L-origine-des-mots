@@ -215,7 +215,7 @@ struct ContentView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
-            .statusBarHidden()  // Approche plus compatible
+            .ignoresSafeArea(.all)  // Mode vraiment plein écran
             .onTapGesture {
                 // Tap en dehors pour défocaliser
                 if isSearchFieldFocused {
@@ -373,9 +373,9 @@ struct ContentView: View {
             VStack(spacing: 16) {
                 // Zone de texte centrée avec bouton X en overlay
                 VStack(spacing: 16) {
-                    // Zone de texte avec X à droite (approach HStack simple)
-                    HStack {
-                        // TextField centré dans un Spacer
+                    // Zone de texte avec X en overlay (vraiment centré)
+                    ZStack {
+                        // TextField parfaitement centré (prend toute la largeur)
                         ZStack {
                             // Placeholder "Rechercher" quand vide et non focalisé
                             if !isSearchFieldFocused && searchText.isEmpty {
@@ -400,22 +400,21 @@ struct ContentView: View {
                                     isSearchFieldFocused = true
                                 }
                         }
-                        .frame(maxWidth: .infinity)
                         
-                        // Bouton X fixe à droite
+                        // Bouton X en overlay absolu (ne décale RIEN)
                         if !searchText.isEmpty {
-                            Button(action: {
-                                searchText = ""
-                            }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.gray.opacity(0.7))
-                                    .font(.system(size: 16, weight: .medium))
+                            HStack {
+                                Spacer()
+                                Button(action: {
+                                    searchText = ""
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.gray.opacity(0.6))
+                                        .font(.system(size: 20))
+                                }
+                                .contentShape(Circle())  // Zone de tap plus grande
                             }
-                            .frame(width: 24, height: 24)
-                        } else {
-                            // Spacer invisible pour maintenir l'alignement
-                            Spacer()
-                                .frame(width: 24, height: 24)
+                            .padding(.trailing, 4)
                         }
                     }
                         
