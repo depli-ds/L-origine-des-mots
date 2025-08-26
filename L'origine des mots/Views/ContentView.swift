@@ -395,7 +395,7 @@ struct ContentView: View {
                                             .font(.system(size: 32, weight: .light))
                                             .foregroundColor(.secondary.opacity(0.8))
                                             .allowsHitTesting(false)
-                                            .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                                            // CUT simple sans transition pour ce message
                                     } else {
                                         Text("Rechercher")
                                             .font(.system(size: 40, weight: .light))
@@ -515,19 +515,16 @@ struct ContentView: View {
     }
     
     private func showNoResultAfterDelay() {
-        // Afficher le message "aucun résultat" après 2 secondes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            withAnimation(.easeInOut(duration: 0.5)) {
-                showNoResultMessage = true
-                loadingState = .idle
-                searchText = ""
-            }
+        // Afficher le message "aucun résultat" IMMÉDIATEMENT après l'erreur
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            // CUT simple sans animation de fondu
+            showNoResultMessage = true
+            loadingState = .idle
+            searchText = ""
             
-            // Masquer le message après 3 secondes
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    showNoResultMessage = false
-                }
+            // Masquer le message après 2.5 secondes avec cut simple
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                showNoResultMessage = false
             }
         }
     }
