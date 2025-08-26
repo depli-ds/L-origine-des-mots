@@ -509,14 +509,14 @@ struct ContentView: View {
     }
     
     private func showNoResultAfterDelay() {
-        // Afficher le message "aucun résultat" IMMÉDIATEMENT après l'erreur
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        // Afficher le message "aucun résultat" PLUS RAPIDEMENT
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             // CUT simple sans animation de fondu
             showNoResultMessage = true
             // NE PAS changer loadingState ici pour éviter flash loupe/X
             
-            // Reset complet après affichage du message (2.5 secondes)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            // Reset complet après affichage du message (1.5 secondes)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 showNoResultMessage = false
                 loadingState = .idle  // Reset loadingState SEULEMENT à la fin
                 // Vider le champ pour repartir proprement
