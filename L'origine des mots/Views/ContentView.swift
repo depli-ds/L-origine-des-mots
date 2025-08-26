@@ -509,12 +509,12 @@ struct ContentView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             // CUT simple sans animation de fondu
             showNoResultMessage = true
-            loadingState = .idle
-            // GARDER le texte pendant l'affichage du message
+            // NE PAS changer loadingState ici pour éviter flash loupe/X
             
-            // Vider le champ après affichage du message (2.5 secondes)
+            // Reset complet après affichage du message (2.5 secondes)
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 showNoResultMessage = false
+                loadingState = .idle  // Reset loadingState SEULEMENT à la fin
                 // Vider le champ pour repartir proprement
                 searchText = ""
             }
