@@ -411,7 +411,7 @@ struct ContentView: View {
                             }
                             
                             // Bouton X en overlay absolu (ne décale RIEN)
-                            if !searchText.isEmpty && !loadingState.isLoading {
+                            if !searchText.isEmpty && !loadingState.isLoading && !showNoResultMessage {
                                 HStack {
                                     Spacer()
                                     Button(action: {
@@ -510,11 +510,13 @@ struct ContentView: View {
             // CUT simple sans animation de fondu
             showNoResultMessage = true
             loadingState = .idle
-            // PLUS de vidage du champ - l'utilisateur garde son texte !
+            // GARDER le texte pendant l'affichage du message
             
-            // Masquer le message après 2.5 secondes avec cut simple
+            // Vider le champ après affichage du message (2.5 secondes)
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 showNoResultMessage = false
+                // Vider le champ pour repartir proprement
+                searchText = ""
             }
         }
     }
