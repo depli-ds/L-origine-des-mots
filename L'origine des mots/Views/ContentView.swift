@@ -411,7 +411,7 @@ struct ContentView: View {
                             }
                             
                             // Bouton X en overlay absolu (ne décale RIEN)
-                            if !searchText.isEmpty && !loadingState.isLoading && !showNoResultMessage {
+                            if !searchText.isEmpty && !loadingState.isLoading && !showNoResultMessage && loadingState == .idle {
                                 HStack {
                                     Spacer()
                                     Button(action: {
