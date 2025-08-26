@@ -518,7 +518,7 @@ struct ContentView: View {
             // CUT simple sans animation de fondu
             showNoResultMessage = true
             loadingState = .idle
-            searchText = ""
+            // PLUS de vidage du champ - l'utilisateur garde son texte !
             
             // Masquer le message après 2.5 secondes avec cut simple
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
