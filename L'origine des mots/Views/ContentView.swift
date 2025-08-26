@@ -388,21 +388,13 @@ struct ContentView: View {
                         ZStack {
                             // TextField parfaitement centré (prend toute la largeur)
                             ZStack {
-                                // Placeholder "Rechercher" ou message "Aucun résultat"
-                                if !isSearchFieldFocused && searchText.isEmpty && !loadingState.isLoading {
-                                    if showNoResultMessage {
-                                        Text("Aucun résultat trouvé")
-                                            .font(.system(size: 32, weight: .light))
-                                            .foregroundColor(.secondary.opacity(0.8))
-                                            .allowsHitTesting(false)
-                                            // CUT simple sans transition pour ce message
-                                    } else {
-                                        Text("Rechercher")
-                                            .font(.system(size: 40, weight: .light))
-                                            .foregroundColor(.secondary.opacity(0.6))  // Meilleur contraste WCAG
-                                            .allowsHitTesting(false)
-                                            .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                                    }
+                                // Placeholder "Rechercher" simple et cohérent
+                                if !isSearchFieldFocused && searchText.isEmpty && !loadingState.isLoading && !showNoResultMessage {
+                                    Text("Rechercher")
+                                        .font(.system(size: 40, weight: .light))
+                                        .foregroundColor(.secondary.opacity(0.6))  // Meilleur contraste WCAG
+                                        .allowsHitTesting(false)
+                                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
                                 }
                                 
                                 // TextField pour la saisie
@@ -447,9 +439,15 @@ struct ContentView: View {
                         
                     }
                         
-                    // Zone fixe pour loupe OU loading (hauteur constante)
+                    // Zone fixe pour loupe OU loading OU message aucun résultat (hauteur constante)
                     ZStack {
-                        if loadingState.isLoading {
+                        if showNoResultMessage {
+                            // Message "Aucun résultat trouvé" dans la même zone que les autres messages
+                            Text("Aucun résultat trouvé")
+                                .font(.system(size: 15))
+                                .foregroundColor(.secondary)
+                                .frame(height: 32)  // Même hauteur que loading
+                        } else if loadingState.isLoading {
                             // Loading à la place de la loupe
                             HStack(spacing: 8) {
                                 ProgressView()
