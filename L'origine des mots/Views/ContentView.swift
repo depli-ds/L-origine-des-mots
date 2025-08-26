@@ -119,14 +119,6 @@ struct ContentView: View {
                     }
                 }
             }
-            
-            // Délai pour laisser l'utilisateur voir qu'une recherche a eu lieu
-            try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconde
-
-            await MainActor.run {
-                // Effacer le champ de recherche pour indiquer qu'il n'y a pas de résultat
-                searchText = ""
-            }
         }
     }
     
