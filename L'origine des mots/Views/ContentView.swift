@@ -30,12 +30,15 @@ struct ContentView: View {
     @FocusState private var isSearchFieldFocused: Bool
     @StateObject private var curator = RemarkableWordsCurator.shared
     @Environment(\.colorScheme) var colorScheme
+    @State private var showNoResultMessage = false
     
     private func performSearch() {
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         
         let wordToSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        isSearchFieldFocused = false
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isSearchFieldFocused = false
+        }
         
         Task {
             do {
@@ -85,13 +88,18 @@ struct ContentView: View {
                         switch cnrtlError {
                         case .wordNotFound:
                             loadingState = .error("Aucune correspondance trouvée pour '\(wordToSearch)'")
+                            // Afficher le message "aucun résultat" après un délai
+                            showNoResultAfterDelay()
                         case .sectionNotFound:
                             loadingState = .error("Pas de résultat disponible pour '\(wordToSearch)'")
+                            // Afficher le message "aucun résultat" après un délai
+                            showNoResultAfterDelay()
                         default:
                             loadingState = .error("Erreur de connexion lors de la recherche")
                         }
                     } else if let etymologyError = error as? EtymologyError {
                         loadingState = .error(etymologyError.localizedDescription)
+                        showNoResultAfterDelay()
                     } else {
                         // Vérifier les types d'erreurs spécifiques
                         let errorMessage = error.localizedDescription.lowercased()
@@ -100,6 +108,7 @@ struct ContentView: View {
                            errorMessage.contains("non trouvé") ||
                            errorMessage.contains("not found") {
                             loadingState = .error("Aucune correspondance trouvée pour '\(wordToSearch)'")
+                            showNoResultAfterDelay()
                         } else if errorMessage.contains("timed out") || errorMessage.contains("timeout") {
                             loadingState = .error("Délai d'attente dépassé\nClaude et GPT-5 sont temporairement surchargés.\nRéessayez dans quelques minutes.")
                         } else if errorMessage.contains("overloaded") {
@@ -158,7 +167,9 @@ struct ContentView: View {
         // Mettre à jour le champ de recherche avec le mot sélectionné
         await MainActor.run {
             searchText = word
-            isSearchFieldFocused = false
+            withAnimation(.easeInOut(duration: 0.3)) {
+                isSearchFieldFocused = false
+            }
         }
         
         do {
@@ -211,7 +222,9 @@ struct ContentView: View {
             .onTapGesture {
                 // Tap en dehors pour défocaliser
                 if isSearchFieldFocused {
-                    isSearchFieldFocused = false
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isSearchFieldFocused = false
+                    }
                 }
             }
             .onAppear {
@@ -375,12 +388,21 @@ struct ContentView: View {
                         ZStack {
                             // TextField parfaitement centré (prend toute la largeur)
                             ZStack {
-                                // Placeholder "Rechercher" quand vide et non focalisé
+                                // Placeholder "Rechercher" ou message "Aucun résultat"
                                 if !isSearchFieldFocused && searchText.isEmpty && !loadingState.isLoading {
-                                    Text("Rechercher")
-                                        .font(.system(size: 40, weight: .light))
-                                        .foregroundColor(.secondary.opacity(0.6))  // Meilleur contraste WCAG
-                                        .allowsHitTesting(false)
+                                    if showNoResultMessage {
+                                        Text("Aucun résultat trouvé")
+                                            .font(.system(size: 32, weight: .light))
+                                            .foregroundColor(.secondary.opacity(0.8))
+                                            .allowsHitTesting(false)
+                                            .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                                    } else {
+                                        Text("Rechercher")
+                                            .font(.system(size: 40, weight: .light))
+                                            .foregroundColor(.secondary.opacity(0.6))  // Meilleur contraste WCAG
+                                            .allowsHitTesting(false)
+                                            .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                                    }
                                 }
                                 
                                 // TextField pour la saisie
@@ -397,7 +419,9 @@ struct ContentView: View {
                                     }
                                     .onTapGesture {
                                         if !loadingState.isLoading {
-                                            isSearchFieldFocused = true
+                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                isSearchFieldFocused = true
+                                            }
                                         }
                                     }
                             }
@@ -473,7 +497,9 @@ struct ContentView: View {
                 .onTapGesture {
                     // Prioriser focus si vide, sinon rechercher
                     if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        isSearchFieldFocused = true
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            isSearchFieldFocused = true
+                        }
                     } else if !loadingState.isLoading {
                         performSearch()
                     }
@@ -483,8 +509,26 @@ struct ContentView: View {
 
             }
             .padding(.horizontal, 24)  // MÊME que les cartes : 24px des bords
-            .padding(.top, 24)      // MÊME espace qu'horizontal pour uniformité
+            .padding(.top, 16)      // Réduit encore pour ergonomie mobile optimale
             .padding(.bottom, 4)    // Espace vraiment réduit pour remonter historique
+        }
+    }
+    
+    private func showNoResultAfterDelay() {
+        // Afficher le message "aucun résultat" après 2 secondes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                showNoResultMessage = true
+                loadingState = .idle
+                searchText = ""
+            }
+            
+            // Masquer le message après 3 secondes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    showNoResultMessage = false
+                }
+            }
         }
     }
     
