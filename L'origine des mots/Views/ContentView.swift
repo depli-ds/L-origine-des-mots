@@ -451,6 +451,10 @@ struct ContentView: View {
                                     .minimumScaleFactor(0.8)
                             }
                             .frame(height: 32)  // Hauteur fixe
+                        } else if case .error = loadingState {
+                            // État d'erreur : on ne montre RIEN (prépare pour message "aucun résultat")
+                            Spacer()
+                                .frame(height: 32)  // Garde la hauteur mais vide
                         } else {
                             // Loupe quand pas de loading
                             Button(action: {
