@@ -361,8 +361,8 @@ struct ContentView: View {
     }
     
     private var searchSection: some View {
-        VStack(spacing: 8) {   // Réduit l'espace pour remonter historique
-            VStack(spacing: 12) {   // Titre légèrement plus haut
+        VStack(spacing: 6) {   // Réduit encore pour ergonomie mobile
+            VStack(spacing: 8) {   // Titre plus proche pour compacité
                 // Titre en dehors du bloc (comme "Origine du mot:")
                 Text("Chercher un mot :")
                     .font(.system(size: 16, weight: .light))
@@ -458,9 +458,9 @@ struct ContentView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(
-                            (colorScheme == .dark ? Color.black : Color.white)
+                            (colorScheme == .dark ? Color(UIColor.systemGray6) : Color.white)
                                 .shadow(.inner(
-                                    color: colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1),
+                                    color: colorScheme == .dark ? .white.opacity(0.2) : .black.opacity(0.1),
                                     radius: 15,  // MÊME radius que les cartes
                                     x: 0,
                                     y: 8
@@ -468,6 +468,16 @@ struct ContentView: View {
                         )
                 )
                 .ignoresSafeArea(.keyboard)  // Bloc fixe quand clavier apparaît
+                // HITBOX ÉTENDUE : Tap sur tout le rectangle lance la recherche
+                .contentShape(RoundedRectangle(cornerRadius: 20))
+                .onTapGesture {
+                    // Prioriser focus si vide, sinon rechercher
+                    if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        isSearchFieldFocused = true
+                    } else if !loadingState.isLoading {
+                        performSearch()
+                    }
+                }
                 
                 Spacer()
 
