@@ -8,6 +8,11 @@ enum Tab {
 struct EtymologyResultView: View {
     let etymology: DirectEtymology
     let word: Word
+    let onToggleFavorite: (Word) async -> Void
+    let onToggleReport: (Word) async -> Void
+    let isFavorite: Bool
+    let isReported: Bool
+    
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
     @State private var showingMap = false
@@ -76,7 +81,39 @@ struct EtymologyResultView: View {
                     ComposedWordsSection(word: word)
                 }
                 
+                // MARK: - Bouton Favoris (au-dessus des km)
+                VStack(spacing: 16) {
+                    // Bouton Favoris (centré)
+                    Button(action: {
+                        Task {
+                            await onToggleFavorite(word)
+                        }
+                    }) {
+                        Label(
+                            isFavorite ? "Retirer des favoris" : "Ajouter aux favoris",
+                            systemImage: isFavorite ? "star.fill" : "star"
+                        )
+                        .foregroundColor(.blue)
+                    }
+                }
+                .padding(.top, 20)
+                
                 WordDistanceFooter(word: word)
+                
+                // MARK: - Bouton Signalement (au-dessous des km)
+                VStack(spacing: 16) {
+                    // Bouton Signalement (centré, petit, gris)
+                    Button(action: {
+                        Task {
+                            await onToggleReport(word)
+                        }
+                    }) {
+                        Text(isReported ? "Mot signalé (Annuler)" : "Signaler ce mot")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+                .padding(.top, 16)
             }
             .padding(24)
         }

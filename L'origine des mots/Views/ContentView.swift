@@ -21,6 +21,9 @@ struct ContentView: View {
     @State private var showingEtymology = false
     @State private var loadingState: LoadingState = .idle
     @State private var searchHistory: [String] = UserDefaults.standard.stringArray(forKey: "searchHistory") ?? []
+    @State private var favoriteWords: Set<String> = Set(UserDefaults.standard.stringArray(forKey: "favoriteWords") ?? [])
+    @State private var favoriteWordsDisplay: [(id: String, name: String)] = []
+    @State private var reportedWords: Set<String> = Set(UserDefaults.standard.stringArray(forKey: "reportedWords") ?? [])
     @State private var remarkableWords: [RemarkableWord] = []
     @State private var isLoadingRemarkableWords = false
     @State private var composedWords: [Word] = []
@@ -132,6 +135,85 @@ struct ContentView: View {
         }
     }
     
+    // MARK: - Gestion des favoris et signalements
+    
+    private func toggleFavorite(for word: Word) async {
+        let wordId = word.id
+        
+        if favoriteWords.contains(wordId) {
+            // Retirer des favoris
+            favoriteWords.remove(wordId)
+        } else {
+            // Ajouter aux favoris
+            favoriteWords.insert(wordId)
+            
+            // Aussi incrémenter le compteur en base
+            do {
+                _ = try await SupabaseService.shared.toggleFavorite(for: wordId)
+            } catch {
+                print("❌ Erreur lors de la mise à jour des favoris: \(error)")
+                // Rollback en cas d'erreur
+                favoriteWords.remove(wordId)
+            }
+        }
+        
+        // Sauvegarder localement
+        UserDefaults.standard.set(Array(favoriteWords), forKey: "favoriteWords")
+        
+        // Recharger l'affichage des favoris
+        Task {
+            await loadFavoriteWordsDisplay()
+        }
+    }
+    
+    private func toggleReport(for word: Word) async {
+        let wordId = word.id
+        
+        if reportedWords.contains(wordId) {
+            // Annuler le signalement
+            reportedWords.remove(wordId)
+        } else {
+            // Signaler le mot
+            reportedWords.insert(wordId)
+            
+            // Aussi incrémenter le compteur en base
+            do {
+                _ = try await SupabaseService.shared.reportWord(for: wordId)
+            } catch {
+                print("❌ Erreur lors du signalement: \(error)")
+                // Rollback en cas d'erreur
+                reportedWords.remove(wordId)
+            }
+        }
+        
+        // Sauvegarder localement
+        UserDefaults.standard.set(Array(reportedWords), forKey: "reportedWords")
+    }
+    
+    private func loadFavoriteWordsDisplay() async {
+        var favoriteDisplay: [(id: String, name: String)] = []
+        
+        for wordId in favoriteWords {
+            do {
+                if let word = try await SupabaseService.shared.fetchWord(byId: wordId) {
+                    favoriteDisplay.append((id: wordId, name: word.word))
+                }
+            } catch {
+                print("❌ Erreur chargement favori \(wordId): \(error)")
+            }
+        }
+        
+        await MainActor.run {
+            favoriteWordsDisplay = favoriteDisplay
+        }
+    }
+    
+    private func removeFavorite(_ wordId: String) {
+        favoriteWords.remove(wordId)
+        UserDefaults.standard.set(Array(favoriteWords), forKey: "favoriteWords")
+        favoriteWordsDisplay.removeAll { $0.id == wordId }
+    }
+    
     private func loadRemarkableWords() async {
         await MainActor.run {
             isLoadingRemarkableWords = true
@@ -232,14 +314,33 @@ struct ContentView: View {
         }
         .sheet(isPresented: etymologySheetBinding) {
             if let word = selectedWord {
-                EtymologyResultView(etymology: word.etymology, word: word)
+                EtymologyResultView(
+                    etymology: word.etymology, 
+                    word: word,
+                    onToggleFavorite: { word in
+                        await toggleFavorite(for: word)
+                    },
+                    onToggleReport: { word in
+                        await toggleReport(for: word)
+                    },
+                    isFavorite: favoriteWords.contains(word.id),
+                    isReported: reportedWords.contains(word.id)
+                )
             }
         }
         .sheet(isPresented: $showingComposedWords) {
             if let composedWord = composedWords.first {
                 ComposedWordsView(
                     composedWord: composedWord,
-                    isPresented: $showingComposedWords
+                    isPresented: $showingComposedWords,
+                    onToggleFavorite: { word in
+                        await toggleFavorite(for: word)
+                    },
+                    onToggleReport: { word in
+                        await toggleReport(for: word)
+                    },
+                    isFavorite: favoriteWords.contains(composedWord.id),
+                    isReported: reportedWords.contains(composedWord.id)
                 )
                 .onAppear {
                     print("🔧 DEBUG: Sheet ComposedWordsView appelée - composedWord: \(composedWord.word)")
@@ -339,7 +440,28 @@ struct ContentView: View {
                             }
                         )
                         
-                        // Espace équilibré entre historique et mots remarquables
+                        // Espace équilibré entre historique et favoris
+                        Spacer()
+                            .frame(height: 16)
+                    }
+                    
+                    // Section Favoris
+                    if !favoriteWordsDisplay.isEmpty {
+                        FavoriteWordsView(
+                            favoriteWords: favoriteWordsDisplay.map { $0.name },
+                            onWordTap: { wordName in
+                                Task {
+                                    await reopenWordFromHistory(wordName)
+                                }
+                            },
+                            onRemove: { wordName in
+                                if let favorite = favoriteWordsDisplay.first(where: { $0.name == wordName }) {
+                                    removeFavorite(favorite.id)
+                                }
+                            }
+                        )
+                        
+                        // Espace équilibré entre favoris et mots remarquables
                         Spacer()
                             .frame(height: 16)
                     }
@@ -536,10 +658,11 @@ struct ContentView: View {
         //     isSearchFieldFocused = true
         // }
         
-        // Vider le cache puis charger les mots remarquables
+        // Vider le cache puis charger les mots remarquables et favoris
         Task {
             await SupabaseService.shared.clearAllCaches()
             await loadRemarkableWords()
+            await loadFavoriteWordsDisplay()
         }
     }
     

@@ -148,7 +148,13 @@ struct EtymologyMapView: View {
     
     private func loadLocations() async {
         do {
-            print("🗺 Chargement des locations temporaires...")
+            print("🗺 Chargement des locations temporaires pour '\(word.word)'...")
+            print("🗺 Distance disponible: \(word.distanceKm ?? 0) km")
+            print("🗺 Étymologie: \(word.etymology.chain.count) étapes")
+            for (index, entry) in word.etymology.chain.enumerated() {
+                print("🗺   \(index + 1). \(entry.language): \(entry.sourceWord)")
+            }
+            
             // Si le mot a explicitement une distance nulle (shortDescription = "0"), ne pas essayer de charger les locations
             if word.shortDescription == "0" {
                 print("ℹ️ Mot sans déplacement géographique, affichage de la vue vide")
@@ -158,6 +164,7 @@ struct EtymologyMapView: View {
             }
             
             let allLocations = try await word.temporaryLocations()
+            print("🗺 Locations récupérées: \(allLocations.count)")
             
             // Filtrer les locations avec des coordonnées valides
             let validLocations = allLocations.filter { location in

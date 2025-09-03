@@ -3,18 +3,26 @@ import SwiftUI
 struct ComposedWordsView: View {
     let composedWord: Word
     @Binding var isPresented: Bool
+    let onToggleFavorite: (Word) async -> Void
+    let onToggleReport: (Word) async -> Void
+    let isFavorite: Bool
+    let isReported: Bool
+    
     @State private var componentWords: [Word] = []
     @State private var isLoadingComponents = true
-    @State private var showingMap = false
-    @State private var selectedWordForMap: Word?
+    @State private var showingMapForWord: Word?
     @State private var showingSources = false
     @State private var selectedWordForSources: Word?
     @State private var isBorrowedComposition = false
     @Environment(\.dismiss) private var dismiss
     
-    init(composedWord: Word, isPresented: Binding<Bool>) {
+    init(composedWord: Word, isPresented: Binding<Bool>, onToggleFavorite: @escaping (Word) async -> Void, onToggleReport: @escaping (Word) async -> Void, isFavorite: Bool, isReported: Bool) {
         self.composedWord = composedWord
         self._isPresented = isPresented
+        self.onToggleFavorite = onToggleFavorite
+        self.onToggleReport = onToggleReport
+        self.isFavorite = isFavorite
+        self.isReported = isReported
         print("🔧 DEBUG ComposedWordsView init - composedWord: \(composedWord.word)")
         print("🔧 DEBUG ComposedWordsView init - components: \(composedWord.components)")
     }
@@ -66,8 +74,9 @@ struct ComposedWordsView: View {
                         HStack(spacing: 20) {
                             if composedWord.hasGeographicalJourney {
                                 Button(action: { 
-                                    selectedWordForMap = composedWord
-                                    showingMap = true 
+                                    print("🔘 Clic bouton voyage pour: '\(composedWord.word)' (mot principal)")
+                                    showingMapForWord = composedWord
+                                    print("🔘 showingMapForWord assigné à: '\(showingMapForWord?.word ?? "nil")'")
                                 }) {
                                     Label("Voir le voyage du mot", systemImage: "map.fill")
                                         .foregroundColor(.blue)
@@ -144,8 +153,9 @@ struct ComposedWordsView: View {
                                 HStack(spacing: 20) {
                                     if word.hasGeographicalJourney {
                                         Button(action: { 
-                                            selectedWordForMap = word
-                                            showingMap = true 
+                                            print("🔘 Clic bouton voyage pour: '\(word.word)' (composant \(index))")
+                                            showingMapForWord = word
+                                            print("🔘 showingMapForWord assigné à: '\(showingMapForWord?.word ?? "nil")'")
                                         }) {
                                             Label("Voir le voyage du mot", systemImage: "map.fill")
                                                 .foregroundColor(.blue)
@@ -188,15 +198,51 @@ struct ComposedWordsView: View {
                             }
                         }
                     }
+                    
+                    // MARK: - Bouton Favoris (au-dessus des km)
+                    VStack(spacing: 16) {
+                        // Bouton Favoris (centré)
+                        Button(action: {
+                            Task {
+                                await onToggleFavorite(composedWord)
+                            }
+                        }) {
+                            Label(
+                                isFavorite ? "Retirer des favoris" : "Ajouter aux favoris",
+                                systemImage: isFavorite ? "star.fill" : "star"
+                            )
+                            .foregroundColor(.blue)
+                        }
+                    }
+                    .padding(.top, 20)
+                    
+                    // MARK: - Bouton Signalement (au-dessous des km)
+                    VStack(spacing: 16) {
+                        // Bouton Signalement (centré, petit, gris)
+                        Button(action: {
+                            Task {
+                                await onToggleReport(composedWord)
+                            }
+                        }) {
+                            Text(isReported ? "Mot signalé (Annuler)" : "Signaler ce mot")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding(.top, 16)
                 }
                 .padding(24)
                 .padding(.top, 40)
             }
             .navigationBarHidden(true)
-            .sheet(isPresented: $showingMap) {
-                if let selectedWord = selectedWordForMap {
-                    EtymologyMapView(word: selectedWord)
-                }
+            .sheet(item: $showingMapForWord) { word in
+                EtymologyMapView(word: word)
+                    .onAppear {
+                        print("🔘 Sheet carte ouverte pour: '\(word.word)'")
+                        print("🗺️ Distance: \(word.distanceKm ?? 0) km")
+                        print("🗺️ Étymologie: \(word.etymology.chain.count) étapes")
+                        print("🗺️ hasGeographicalJourney: \(word.hasGeographicalJourney)")
+                    }
             }
             .sheet(isPresented: $showingSources) {
                 if let selectedWord = selectedWordForSources {
@@ -301,7 +347,9 @@ struct ComposedWordsView: View {
                 distanceKm: nil, // Sera calculée après création
                 isComposedWord: false,
                 components: [],
-                gptAnalysis: nil
+                gptAnalysis: nil,
+                favoriteCount: nil,
+                reportCount: nil
             )
             
             // Calcul de la distance pour auto-
@@ -346,7 +394,9 @@ struct ComposedWordsView: View {
                 distanceKm: nil, // Sera calculée après création
                 isComposedWord: false,
                 components: [],
-                gptAnalysis: nil
+                gptAnalysis: nil,
+                favoriteCount: nil,
+                reportCount: nil
             )
             
             // Calcul de la distance pour mobile
@@ -374,7 +424,9 @@ struct ComposedWordsView: View {
                 distanceKm: autoDistance,
                 isComposedWord: autoWord.isComposedWord,
                 components: autoWord.components,
-                gptAnalysis: autoWord.gptAnalysis
+                gptAnalysis: autoWord.gptAnalysis,
+                favoriteCount: nil,
+                reportCount: nil
             )
             
             let finalMobileWord = Word(
@@ -392,7 +444,9 @@ struct ComposedWordsView: View {
                 distanceKm: mobileDistance,
                 isComposedWord: mobileWord.isComposedWord,
                 components: mobileWord.components,
-                gptAnalysis: mobileWord.gptAnalysis
+                gptAnalysis: mobileWord.gptAnalysis,
+                favoriteCount: nil,
+                reportCount: nil
             )
             
             virtualWords = [finalAutoWord, finalMobileWord]

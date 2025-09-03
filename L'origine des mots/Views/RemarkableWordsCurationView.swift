@@ -176,7 +176,8 @@ struct RemarkableWordsCurationView: View {
                     foundInCNRTL: word.foundInCNRTL, foundWithCNRTLAndClaude: word.foundWithCNRTLAndClaude,
                     isRemarkable: newStatus, shortDescription: word.shortDescription,
                     distanceKm: word.distanceKm, isComposedWord: word.isComposedWord,
-                    components: word.components, gptAnalysis: word.gptAnalysis
+                    components: word.components, gptAnalysis: word.gptAnalysis,
+                    favoriteCount: word.favoriteCount, reportCount: word.reportCount
                 )
                 updatingWords.insert(word.id)
             }
@@ -224,7 +225,8 @@ struct RemarkableWordsCurationView: View {
                         foundInCNRTL: word.foundInCNRTL, foundWithCNRTLAndClaude: word.foundWithCNRTLAndClaude,
                         isRemarkable: !newStatus, shortDescription: word.shortDescription,
                         distanceKm: word.distanceKm, isComposedWord: word.isComposedWord,
-                        components: word.components, gptAnalysis: word.gptAnalysis
+                        components: word.components, gptAnalysis: word.gptAnalysis,
+                        favoriteCount: word.favoriteCount, reportCount: word.reportCount
                     )
                 }
                 updatingWords.remove(word.id)

@@ -166,7 +166,9 @@ class EtymologyOrchestrator {
             distanceKm: nil,  // Sera calculé lors de la sauvegarde
             isComposedWord: etymologyAnalysis.is_composed_word ?? false,
             components: etymologyAnalysis.components ?? [],
-            gptAnalysis: etymologyAnalysis
+            gptAnalysis: etymologyAnalysis,
+            favoriteCount: nil,
+            reportCount: nil
         )
         
         // 8. Sauvegarde avec calcul automatique de distance
@@ -192,7 +194,9 @@ class EtymologyOrchestrator {
             distanceKm: distance,  // ✅ Mettre à jour avec la distance calculée
             isComposedWord: newWord.isComposedWord,
             components: newWord.components,
-            gptAnalysis: newWord.gptAnalysis
+            gptAnalysis: newWord.gptAnalysis,
+            favoriteCount: newWord.favoriteCount,
+            reportCount: newWord.reportCount
         )
         
         return wordWithDistance

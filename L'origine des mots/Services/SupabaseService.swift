@@ -404,6 +404,85 @@ class SupabaseService: @unchecked Sendable {
         print("✅ Mot '\(remarkableWord.word)' marqué comme remarquable")
     }
     
+    // MARK: - Gestion des favoris et signalements
+    
+    /// Ajoute ou retire un mot des favoris
+    func toggleFavorite(for wordId: String) async throws -> Bool {
+        print("⭐ Toggle favori pour le mot ID: \(wordId)")
+        
+        // D'abord récupérer le mot pour connaître son état actuel
+        guard let word = try await fetchWordById(wordId) else {
+            throw ServiceError.resourceNotFound
+        }
+        
+        let currentCount = word.favoriteCount ?? 0
+        let newCount = currentCount + 1
+        
+        let url = baseURL.appendingPathComponent("etymologies")
+            .appendingQueryItem("id", value: "eq.\(wordId)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("return=minimal", forHTTPHeaderField: "Prefer")
+        
+        let updateData: [String: Any] = [
+            "favorite_count": newCount
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: updateData)
+        
+        let _: EmptyResponse = try await performRequest(request)
+        print("✅ Compteur favoris mis à jour: \(newCount)")
+        
+        return true
+    }
+    
+    /// Signale un mot comme ayant une erreur
+    func reportWord(for wordId: String) async throws -> Bool {
+        print("🚨 Signalement d'erreur pour le mot ID: \(wordId)")
+        
+        // D'abord récupérer le mot pour connaître son état actuel
+        guard let word = try await fetchWordById(wordId) else {
+            throw ServiceError.resourceNotFound
+        }
+        
+        let currentCount = word.reportCount ?? 0
+        let newCount = currentCount + 1
+        
+        let url = baseURL.appendingPathComponent("etymologies")
+            .appendingQueryItem("id", value: "eq.\(wordId)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("return=minimal", forHTTPHeaderField: "Prefer")
+        
+        let updateData: [String: Any] = [
+            "report_count": newCount
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: updateData)
+        
+        let _: EmptyResponse = try await performRequest(request)
+        print("✅ Compteur signalements mis à jour: \(newCount)")
+        
+        return true
+    }
+    
+    /// Récupère un mot par son ID
+    private func fetchWordById(_ wordId: String) async throws -> Word? {
+        let url = baseURL.appendingPathComponent("etymologies")
+            .appendingQueryItem("select", value: "id,word,etymology,created_at,short_description,distance_km,is_remarkable,is_composed_word,components,favorite_count,report_count")
+            .appendingQueryItem("id", value: "eq.\(wordId)")
+            .appendingQueryItem("limit", value: "1")
+        
+        let request = URLRequest(url: url)
+        let words: [SupabaseWord] = try await performRequest(request, decoder: remarkableWordDecoder)
+        
+        return words.first?.toWord()
+    }
+    
     // Structure pour la sauvegarde en base (correspondant exactement aux colonnes de etymologies)
     private struct DatabaseWord: Codable {
         let id: String
@@ -430,6 +509,8 @@ class SupabaseService: @unchecked Sendable {
         let isRemarkable: Bool?  // Statut de mot remarquable
         let isComposedWord: Bool?  // Si le mot est composé (ex: abat-jour)
         let components: [String]?  // Composants du mot composé (ex: ["abat", "jour"])
+        let favoriteCount: Int?  // Nombre de fois ajouté aux favoris
+        let reportCount: Int?  // Nombre de signalements
         
         enum CodingKeys: String, CodingKey {
             case id, word, etymology
@@ -439,6 +520,8 @@ class SupabaseService: @unchecked Sendable {
             case isRemarkable = "is_remarkable"
             case isComposedWord = "is_composed_word"
             case components
+            case favoriteCount = "favorite_count"
+            case reportCount = "report_count"
         }
         
         // Custom init pour gérer le décodage de distance_km qui peut être string ou double
@@ -452,6 +535,8 @@ class SupabaseService: @unchecked Sendable {
             isRemarkable = try container.decodeIfPresent(Bool.self, forKey: .isRemarkable)
             isComposedWord = try container.decodeIfPresent(Bool.self, forKey: .isComposedWord)
             components = try container.decodeIfPresent([String].self, forKey: .components)
+            favoriteCount = try container.decodeIfPresent(Int.self, forKey: .favoriteCount)
+            reportCount = try container.decodeIfPresent(Int.self, forKey: .reportCount)
             
             // 🔧 Décodage simple de distance_km
             distanceKm = try container.decodeIfPresent(Double.self, forKey: .distanceKm)
@@ -487,7 +572,9 @@ class SupabaseService: @unchecked Sendable {
                 distanceKm: distanceKm,
                 isComposedWord: isComposedWord ?? false,
                 components: components ?? [],
-                gptAnalysis: nil
+                gptAnalysis: nil,
+                favoriteCount: favoriteCount,
+                reportCount: reportCount
             )
         }
     }
@@ -1065,7 +1152,9 @@ class SupabaseService: @unchecked Sendable {
                     distanceKm: nil,
                     isComposedWord: false,
                     components: [],
-                    gptAnalysis: nil
+                    gptAnalysis: nil,
+                    favoriteCount: nil,
+                    reportCount: nil
                 )
                 
                 // Calculer la distance
@@ -1128,7 +1217,9 @@ class SupabaseService: @unchecked Sendable {
             distanceKm: distance,
             isComposedWord: word.isComposedWord,
             components: word.components,
-            gptAnalysis: word.gptAnalysis
+            gptAnalysis: word.gptAnalysis,
+            favoriteCount: word.favoriteCount,
+            reportCount: word.reportCount
         )
         
         // Vérifier d'abord si le mot existe déjà pour éviter l'erreur 409
@@ -1439,7 +1530,9 @@ class SupabaseService: @unchecked Sendable {
                     distanceKm: nil,
                     isComposedWord: false,
                     components: [],
-                    gptAnalysis: nil
+                    gptAnalysis: nil,
+                    favoriteCount: nil,
+                    reportCount: nil
                 )
             }
         }
@@ -1546,7 +1639,9 @@ class SupabaseService: @unchecked Sendable {
                     distanceKm: nil,
                     isComposedWord: false,
                     components: [],
-                    gptAnalysis: nil
+                    gptAnalysis: nil,
+                    favoriteCount: nil,
+                    reportCount: nil
                 )
                 
                 // Calculer la distance
@@ -1620,7 +1715,9 @@ class SupabaseService: @unchecked Sendable {
                 distanceKm: response.distance_km,
                 isComposedWord: false,
                 components: [],
-                gptAnalysis: nil
+                gptAnalysis: nil,
+                favoriteCount: nil,
+                reportCount: nil
             )
         }
     }
@@ -1661,7 +1758,9 @@ class SupabaseService: @unchecked Sendable {
                 distanceKm: response.distance_km,
                 isComposedWord: false,
                 components: [],
-                gptAnalysis: nil
+                gptAnalysis: nil,
+                favoriteCount: nil,
+                reportCount: nil
             )
         }
     }
@@ -1883,7 +1982,7 @@ class SupabaseService: @unchecked Sendable {
             print("✅ Mot reclassifié comme emprunt composé: \(components)")
             
             // Vider le cache pour forcer le rechargement
-            _ = await clearCache()
+            clearCache()
         } catch {
             print("❌ ERREUR lors de la reclassification: \(error)")
             throw error

@@ -1,6 +1,6 @@
 import Foundation
 
-struct Word: Codable {
+struct Word: Codable, Identifiable {
     let id: String
     let word: String
     let etymology: DirectEtymology
@@ -16,6 +16,8 @@ struct Word: Codable {
     let isComposedWord: Bool
     let components: [String]
     let gptAnalysis: EtymologyAnalysis?
+    let favoriteCount: Int?
+    let reportCount: Int?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -33,6 +35,8 @@ struct Word: Codable {
         case isComposedWord
         case components
         case gptAnalysis
+        case favoriteCount
+        case reportCount
     }
 }
 
@@ -52,7 +56,9 @@ extension Word {
         distanceKm: nil,
         isComposedWord: false,
         components: [],
-        gptAnalysis: nil
+        gptAnalysis: nil,
+        favoriteCount: nil,
+        reportCount: nil
     )
 
     var hasGeographicalJourney: Bool {
