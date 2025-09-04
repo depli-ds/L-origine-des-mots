@@ -108,14 +108,6 @@ struct RemarkableWordsCurationView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Fermer") { 
-                        NotificationCenter.default.post(name: NSNotification.Name("CurationViewClosed"), object: nil)
-                        dismiss() 
-                    }
-                }
-            }
         }
         .task { await loadWords() }
         .alert("Erreur", isPresented: .constant(errorMessage != nil)) {
@@ -128,22 +120,38 @@ struct RemarkableWordsCurationView: View {
     }
     
     private var headerView: some View {
-        VStack(spacing: 4) {
-            Text("Curation")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            // Stats en petit sous le titre
-            let favoritesCount = allWords.filter { favoriteWords[$0.id] != nil }.count
-            let reportsCount = allWords.filter { word in 
-                reportedWords.contains { $0.id == word.id }
-            }.count
-            
-            Text("\(totalWords) mots • \(remarkableWords) remarquables • \(favoritesCount) favoris • \(reportsCount) signalés")
-                .font(.caption)
-                .foregroundColor(.secondary)
+        VStack(spacing: 0) {
+            // En-tête avec bouton fermer
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Curation")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+                    // Stats en petit sous le titre
+                    let favoritesCount = allWords.filter { favoriteWords[$0.id] != nil }.count
+                    let reportsCount = allWords.filter { word in 
+                        reportedWords.contains { $0.id == word.id }
+                    }.count
+                    
+                    Text("\(totalWords) mots • \(remarkableWords) remarquables • \(favoritesCount) favoris • \(reportsCount) signalés")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                Button("Fermer") { 
+                    NotificationCenter.default.post(name: NSNotification.Name("CurationViewClosed"), object: nil)
+                    dismiss() 
+                }
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(.blue)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 20)
+            .padding(.bottom, 16)
         }
-        .padding(.vertical, 8)
     }
     
     private var sortingView: some View {
@@ -390,20 +398,27 @@ struct ModernWordCurationRow: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    // AJOUT: Indicateur favori
-                    if isFavorite {
-                        Label("\(favoriteCount ?? 0)", systemImage: "star.fill")
+                    // AJOUT: Indicateur favori (local + base)
+                    if isFavorite || (favoriteCount ?? 0) > 0 {
+                        let count = favoriteCount ?? 0
+                        let icon = isFavorite ? "star.fill" : "star"
+                        let color: Color = isFavorite ? .blue : .gray
+                        
+                        Label("\(count)", systemImage: icon)
                             .font(.caption)
-                            .foregroundColor(.blue)
+                            .foregroundColor(color)
                     }
                     
-                    // AJOUT: Indicateur signalement
-                    if reportButtonState != .notReported {
+                    // AJOUT: Indicateur signalement (local + base)
+                    if reportButtonState != .notReported || (reportCount ?? 0) > 0 {
+                        let count = reportCount ?? 0
                         let (icon, color) = reportButtonState == .corrected ? 
                             ("checkmark.circle.fill", Color.green) : 
-                            ("exclamationmark.triangle.fill", Color.orange)
+                            reportButtonState == .reported ?
+                            ("exclamationmark.triangle.fill", Color.orange) :
+                            ("exclamationmark.triangle", Color.gray)
                         
-                        Label("\(reportCount ?? 0)", systemImage: icon)
+                        Label("\(count)", systemImage: icon)
                             .font(.caption)
                             .foregroundColor(color)
                     }
