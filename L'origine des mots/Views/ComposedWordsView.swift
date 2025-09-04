@@ -11,8 +11,7 @@ struct ComposedWordsView: View {
     @State private var componentWords: [Word] = []
     @State private var isLoadingComponents = true
     @State private var showingMapForWord: Word?
-    @State private var showingSources = false
-    @State private var selectedWordForSources: Word?
+    @State private var showingSourcesForWord: Word?
     @State private var isBorrowedComposition = false
     @Environment(\.dismiss) private var dismiss
     
@@ -85,8 +84,7 @@ struct ComposedWordsView: View {
                                 Spacer()
                                 
                                 Button(action: { 
-                                    selectedWordForSources = composedWord
-                                    showingSources = true 
+                                    showingSourcesForWord = composedWord
                                 }) {
                                     Label("Sources", systemImage: "text.book.closed.fill")
                                         .foregroundColor(.blue)
@@ -95,8 +93,7 @@ struct ComposedWordsView: View {
                                 Spacer()
                                 
                                 Button(action: { 
-                                    selectedWordForSources = composedWord
-                                    showingSources = true 
+                                    showingSourcesForWord = composedWord
                                 }) {
                                     Label("Sources", systemImage: "text.book.closed.fill")
                                         .foregroundColor(.blue)
@@ -164,8 +161,7 @@ struct ComposedWordsView: View {
                                         Spacer()
                                         
                                         Button(action: { 
-                                            selectedWordForSources = word
-                                            showingSources = true 
+                                            showingSourcesForWord = word
                                         }) {
                                             Label("Sources", systemImage: "text.book.closed.fill")
                                                 .foregroundColor(.blue)
@@ -174,8 +170,7 @@ struct ComposedWordsView: View {
                                         Spacer()
                                         
                                         Button(action: { 
-                                            selectedWordForSources = word
-                                            showingSources = true 
+                                            showingSourcesForWord = word
                                         }) {
                                             Label("Sources", systemImage: "text.book.closed.fill")
                                                 .foregroundColor(.blue)
@@ -244,10 +239,8 @@ struct ComposedWordsView: View {
                         print("🗺️ hasGeographicalJourney: \(word.hasGeographicalJourney)")
                     }
             }
-            .sheet(isPresented: $showingSources) {
-                if let selectedWord = selectedWordForSources {
-                    SourcesView(word: selectedWord, context: .component)
-                }
+            .sheet(item: $showingSourcesForWord) { word in
+                SourcesView(word: word, context: .component)
             }
             .onAppear {
                 loadComponentWords()

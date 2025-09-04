@@ -5,6 +5,8 @@ struct FavoriteWordsView: View {
     let onWordTap: (String) -> Void
     let onRemove: (String) -> Void
     
+    @State private var animatingStars: Set<String> = []
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Mes Favoris")
@@ -19,12 +21,21 @@ struct FavoriteWordsView: View {
                                 }
                                 .accessibilityLabel("Ouvrir \(favorite.name)")
                             Button(action: { 
-                                withAnimation {
-                                    onRemove(favorite.id)
+                                // Animation étoile : pleine bleue → vide bleue → disparition
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    animatingStars.insert(favorite.id)
+                                }
+                                
+                                // Après 150ms, supprimer définitivement
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    withAnimation(.easeOut(duration: 0.3)) {
+                                        onRemove(favorite.id)
+                                        animatingStars.remove(favorite.id)
+                                    }
                                 }
                             }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.gray.opacity(0.7))
+                                Image(systemName: animatingStars.contains(favorite.id) ? "star" : "star.fill")
+                                    .foregroundColor(.blue)  // Toujours bleue (pleine ou vide)
                                     .font(.system(size: 14, weight: .medium))
                             }
                             .accessibilityLabel("Retirer \(favorite.name) des favoris")

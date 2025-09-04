@@ -520,9 +520,9 @@ struct ContentView: View {
                 VStack(spacing: 0) {
                     AppHeaderView()
                     
-                    // Spacer pour centrer le champ de recherche (réduit)
+                    // Spacer pour centrer le champ de recherche (égal à celui d'après)
                         Spacer()
-                        .frame(height: max(40, (geometry.size.height - 400) / 4))
+                        .frame(height: max(40, (geometry.size.height - 400) / 6))
                     
                     // Champ de recherche centré verticalement
                     searchSection

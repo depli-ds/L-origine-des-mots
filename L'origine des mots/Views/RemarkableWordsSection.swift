@@ -8,16 +8,18 @@ struct RemarkableWordsSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Titre avec bouton d'édition (toujours affiché)
+            // Titre avec bouton d'édition (mode DEBUG uniquement)
             HStack {
                 Text("Mots remarquables")
                     .font(.title2)
                 Spacer()
+                #if DEBUG
                 Button(action: onEditTap) {
                     Text("Éditer")
                         .font(.caption)
                         .foregroundColor(.blue)
                 }
+                #endif
             }
             .padding(.horizontal)
             .padding(.bottom, 8)
