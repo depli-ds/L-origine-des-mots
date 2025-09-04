@@ -11,7 +11,7 @@ struct EtymologyResultView: View {
     let onToggleFavorite: (Word) async -> Void
     let onToggleReport: (Word) async -> Void
     let isFavorite: Bool
-    let isReported: Bool
+    let reportButtonState: ReportButtonState
     
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
@@ -108,7 +108,7 @@ struct EtymologyResultView: View {
                             await onToggleReport(word)
                         }
                     }) {
-                        Text(isReported ? "Mot signalé (Annuler)" : "Signaler ce mot")
+                        Text(reportButtonState.buttonText)
                             .font(.caption)
                             .foregroundColor(.gray)
                     }

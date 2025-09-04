@@ -1,6 +1,28 @@
 import SwiftUI
 import Combine
 
+// Structure pour les signalements avec dates
+struct ReportedWord: Codable {
+    let id: String
+    let wordName: String
+    let reportDate: Date
+}
+
+// États du bouton de signalement
+enum ReportButtonState {
+    case notReported
+    case reported      // "Mot signalé (Annuler)"
+    case corrected     // "Mot corrigé (Signaler à nouveau)"
+    
+    var buttonText: String {
+        switch self {
+        case .notReported: return "Signaler ce mot"
+        case .reported: return "Mot signalé (Annuler)"
+        case .corrected: return "Mot corrigé (Signaler à nouveau)"
+        }
+    }
+}
+
 extension View {
     func placeholder<Content: View>(
         when shouldShow: Bool,
@@ -21,9 +43,29 @@ struct ContentView: View {
     @State private var showingEtymology = false
     @State private var loadingState: LoadingState = .idle
     @State private var searchHistory: [String] = UserDefaults.standard.stringArray(forKey: "searchHistory") ?? []
-    @State private var favoriteWords: Set<String> = Set(UserDefaults.standard.stringArray(forKey: "favoriteWords") ?? [])
+    @State private var favoriteWords: [String: String] = {
+        if let data = UserDefaults.standard.data(forKey: "favoriteWords"),
+           let decoded = try? JSONDecoder().decode([String: String].self, from: data) {
+            return decoded
+        }
+        // Migration depuis l'ancien format Set<String>
+        let oldFavorites = UserDefaults.standard.stringArray(forKey: "favoriteWords") ?? []
+        var migrated: [String: String] = [:]
+        for id in oldFavorites {
+            migrated[id] = "Mot favori" // Nom par défaut pour migration
+        }
+        return migrated
+    }()
     @State private var favoriteWordsDisplay: [(id: String, name: String)] = []
-    @State private var reportedWords: Set<String> = Set(UserDefaults.standard.stringArray(forKey: "reportedWords") ?? [])
+    @State private var reportedWords: [ReportedWord] = {
+        if let data = UserDefaults.standard.data(forKey: "reportedWords"),
+           let decoded = try? JSONDecoder().decode([ReportedWord].self, from: data) {
+            return decoded
+        }
+        // Migration depuis l'ancien format Set<String>
+        let oldReports = UserDefaults.standard.stringArray(forKey: "reportedWords") ?? []
+        return oldReports.map { ReportedWord(id: $0, wordName: "Mot signalé", reportDate: Date()) }
+    }()
     @State private var remarkableWords: [RemarkableWord] = []
     @State private var isLoadingRemarkableWords = false
     @State private var composedWords: [Word] = []
@@ -40,7 +82,7 @@ struct ContentView: View {
         
         let wordToSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         withAnimation(.easeInOut(duration: 0.3)) {
-            isSearchFieldFocused = false
+        isSearchFieldFocused = false
         }
         
         Task {
@@ -80,7 +122,7 @@ struct ContentView: View {
                             showingComposedWords = true
                         } else {
                             selectedWord = newWord
-                            showingEtymology = true
+                    showingEtymology = true
                         }
                     }
                 }
@@ -140,12 +182,12 @@ struct ContentView: View {
     private func toggleFavorite(for word: Word) async {
         let wordId = word.id
         
-        if favoriteWords.contains(wordId) {
+        if favoriteWords[wordId] != nil {
             // Retirer des favoris
-            favoriteWords.remove(wordId)
+            favoriteWords.removeValue(forKey: wordId)
         } else {
-            // Ajouter aux favoris
-            favoriteWords.insert(wordId)
+            // Ajouter aux favoris (stocker ID + nom)
+            favoriteWords[wordId] = word.word
             
             // Aussi incrémenter le compteur en base
             do {
@@ -153,12 +195,14 @@ struct ContentView: View {
             } catch {
                 print("❌ Erreur lors de la mise à jour des favoris: \(error)")
                 // Rollback en cas d'erreur
-                favoriteWords.remove(wordId)
+                favoriteWords.removeValue(forKey: wordId)
             }
         }
         
-        // Sauvegarder localement
-        UserDefaults.standard.set(Array(favoriteWords), forKey: "favoriteWords")
+        // Sauvegarder localement (nouveau format JSON)
+        if let encoded = try? JSONEncoder().encode(favoriteWords) {
+            UserDefaults.standard.set(encoded, forKey: "favoriteWords")
+        }
         
         // Recharger l'affichage des favoris
         Task {
@@ -166,15 +210,35 @@ struct ContentView: View {
         }
     }
     
+    private func getReportButtonState(for word: Word) -> ReportButtonState {
+        guard let report = reportedWords.first(where: { $0.id == word.id }) else {
+            return .notReported
+        }
+        
+        // Si le mot a été mis à jour après le signalement → Corrigé
+        if word.updatedAt > report.reportDate {
+            return .corrected
+        } else {
+            return .reported
+        }
+    }
+    
     private func toggleReport(for word: Word) async {
         let wordId = word.id
         
-        if reportedWords.contains(wordId) {
+        if let existingIndex = reportedWords.firstIndex(where: { $0.id == wordId }) {
             // Annuler le signalement
-            reportedWords.remove(wordId)
+            reportedWords.remove(at: existingIndex)
+            print("🔄 Signalement annulé pour '\(word.word)'")
         } else {
-            // Signaler le mot
-            reportedWords.insert(wordId)
+            // Signaler le mot (nouveau ou re-signalement après correction)
+            let newReport = ReportedWord(
+                id: wordId,
+                wordName: word.word,
+                reportDate: Date()
+            )
+            reportedWords.append(newReport)
+            print("📝 Nouveau signalement pour '\(word.word)'")
             
             // Aussi incrémenter le compteur en base
             do {
@@ -182,24 +246,35 @@ struct ContentView: View {
             } catch {
                 print("❌ Erreur lors du signalement: \(error)")
                 // Rollback en cas d'erreur
-                reportedWords.remove(wordId)
+                if let rollbackIndex = reportedWords.firstIndex(where: { $0.id == wordId }) {
+                    reportedWords.remove(at: rollbackIndex)
+                }
             }
         }
         
-        // Sauvegarder localement
-        UserDefaults.standard.set(Array(reportedWords), forKey: "reportedWords")
+        // Sauvegarder localement (nouveau format JSON)
+        if let encoded = try? JSONEncoder().encode(reportedWords) {
+            UserDefaults.standard.set(encoded, forKey: "reportedWords")
+        }
     }
     
     private func loadFavoriteWordsDisplay() async {
         var favoriteDisplay: [(id: String, name: String)] = []
         
-        for wordId in favoriteWords {
+        for (wordId, wordName) in favoriteWords {
             do {
                 if let word = try await SupabaseService.shared.fetchWord(byId: wordId) {
+                    // ✅ Mot existe toujours
                     favoriteDisplay.append((id: wordId, name: word.word))
+                } else {
+                    // ⚠️ Mot orphelin → Garder avec nom stocké (sera géré au tap)
+                    favoriteDisplay.append((id: wordId, name: wordName))
+                    print("⚠️ Favori orphelin détecté: '\(wordName)' (ID: \(wordId))")
                 }
             } catch {
-                print("❌ Erreur chargement favori \(wordId): \(error)")
+                // ⚠️ Erreur → Garder avec nom stocké
+                favoriteDisplay.append((id: wordId, name: wordName))
+                print("❌ Erreur chargement favori '\(wordName)' (ID: \(wordId)): \(error)")
             }
         }
         
@@ -209,9 +284,41 @@ struct ContentView: View {
     }
     
     private func removeFavorite(_ wordId: String) {
-        favoriteWords.remove(wordId)
-        UserDefaults.standard.set(Array(favoriteWords), forKey: "favoriteWords")
+        favoriteWords.removeValue(forKey: wordId)
+        if let encoded = try? JSONEncoder().encode(favoriteWords) {
+            UserDefaults.standard.set(encoded, forKey: "favoriteWords")
+        }
         favoriteWordsDisplay.removeAll { $0.id == wordId }
+    }
+    
+    private func handleFavoriteTap(_ favoriteId: String) async {
+        do {
+            if let word = try await SupabaseService.shared.fetchWord(byId: favoriteId) {
+                // ✅ Mot existe → Ouvrir normalement
+                print("✅ Favori '\(word.word)' trouvé, ouverture directe")
+                await reopenWordFromHistory(word.word)
+            } else {
+                // ⚠️ Orphelin → Recherche silencieuse via le champ
+                if let wordName = favoriteWords[favoriteId] {
+                    print("🔄 Favori orphelin détecté: '\(wordName)' → Recherche complète")
+                    await MainActor.run {
+                        searchText = wordName
+                        isSearchFieldFocused = false // Pas de focus clavier
+                    }
+                    await performSearch() // Passe par toute la logique de recherche
+                }
+            }
+        } catch {
+            // ⚠️ Erreur → Fallback sur recherche
+            if let wordName = favoriteWords[favoriteId] {
+                print("🔄 Erreur favori '\(wordName)' → Fallback recherche")
+                await MainActor.run {
+                    searchText = wordName
+                    isSearchFieldFocused = false
+                }
+                await performSearch()
+            }
+        }
     }
     
     private func loadRemarkableWords() async {
@@ -230,7 +337,7 @@ struct ContentView: View {
         } catch {
             print("❌ Erreur lors de la récupération des mots remarquables: \(error)")
             await MainActor.run {
-                remarkableWords = []
+            remarkableWords = []
                 isLoadingRemarkableWords = false
             }
             print("✅ 0 mots remarquables récupérés (erreur)")
@@ -280,7 +387,7 @@ struct ContentView: View {
             performSearch()
         }
     }
-
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -323,8 +430,8 @@ struct ContentView: View {
                     onToggleReport: { word in
                         await toggleReport(for: word)
                     },
-                    isFavorite: favoriteWords.contains(word.id),
-                    isReported: reportedWords.contains(word.id)
+                    isFavorite: favoriteWords[word.id] != nil,
+                    reportButtonState: getReportButtonState(for: word)
                 )
             }
         }
@@ -339,8 +446,8 @@ struct ContentView: View {
                     onToggleReport: { word in
                         await toggleReport(for: word)
                     },
-                    isFavorite: favoriteWords.contains(composedWord.id),
-                    isReported: reportedWords.contains(composedWord.id)
+                    isFavorite: favoriteWords[composedWord.id] != nil,
+                    reportButtonState: getReportButtonState(for: composedWord)
                 )
                 .onAppear {
                     print("🔧 DEBUG: Sheet ComposedWordsView appelée - composedWord: \(composedWord.word)")
@@ -414,7 +521,7 @@ struct ContentView: View {
                     AppHeaderView()
                     
                     // Spacer pour centrer le champ de recherche (réduit)
-                    Spacer()
+                        Spacer()
                         .frame(height: max(40, (geometry.size.height - 400) / 4))
                     
                     // Champ de recherche centré verticalement
@@ -448,16 +555,14 @@ struct ContentView: View {
                     // Section Favoris
                     if !favoriteWordsDisplay.isEmpty {
                         FavoriteWordsView(
-                            favoriteWords: favoriteWordsDisplay.map { $0.name },
-                            onWordTap: { wordName in
+                            favoriteWords: favoriteWordsDisplay,
+                            onWordTap: { favoriteId in
                                 Task {
-                                    await reopenWordFromHistory(wordName)
+                                    await handleFavoriteTap(favoriteId)
                                 }
                             },
-                            onRemove: { wordName in
-                                if let favorite = favoriteWordsDisplay.first(where: { $0.name == wordName }) {
-                                    removeFavorite(favorite.id)
-                                }
+                            onRemove: { favoriteId in
+                                removeFavorite(favoriteId)
                             }
                         )
                         
@@ -466,7 +571,7 @@ struct ContentView: View {
                             .frame(height: 16)
                     }
                     
-                    RemarkableWordsSection(
+                                RemarkableWordsSection(
                         remarkableWords: remarkableWords,
                         isLoading: isLoadingRemarkableWords,
                         onWordTap: { remarkableWord in
@@ -575,7 +680,7 @@ struct ContentView: View {
                             .frame(height: 32)  // Hauteur fixe
                         } else if case .error = loadingState {
                             // État d'erreur : on ne montre RIEN (prépare pour message "aucun résultat")
-                            Spacer()
+                    Spacer()
                                 .frame(height: 32)  // Garde la hauteur mais vide
                         } else {
                             // Loupe quand pas de loading

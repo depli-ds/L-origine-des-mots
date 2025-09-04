@@ -6,7 +6,7 @@ struct ComposedWordsView: View {
     let onToggleFavorite: (Word) async -> Void
     let onToggleReport: (Word) async -> Void
     let isFavorite: Bool
-    let isReported: Bool
+    let reportButtonState: ReportButtonState
     
     @State private var componentWords: [Word] = []
     @State private var isLoadingComponents = true
@@ -16,13 +16,13 @@ struct ComposedWordsView: View {
     @State private var isBorrowedComposition = false
     @Environment(\.dismiss) private var dismiss
     
-    init(composedWord: Word, isPresented: Binding<Bool>, onToggleFavorite: @escaping (Word) async -> Void, onToggleReport: @escaping (Word) async -> Void, isFavorite: Bool, isReported: Bool) {
+    init(composedWord: Word, isPresented: Binding<Bool>, onToggleFavorite: @escaping (Word) async -> Void, onToggleReport: @escaping (Word) async -> Void, isFavorite: Bool, reportButtonState: ReportButtonState) {
         self.composedWord = composedWord
         self._isPresented = isPresented
         self.onToggleFavorite = onToggleFavorite
         self.onToggleReport = onToggleReport
         self.isFavorite = isFavorite
-        self.isReported = isReported
+        self.reportButtonState = reportButtonState
         print("🔧 DEBUG ComposedWordsView init - composedWord: \(composedWord.word)")
         print("🔧 DEBUG ComposedWordsView init - components: \(composedWord.components)")
     }
@@ -224,7 +224,7 @@ struct ComposedWordsView: View {
                                 await onToggleReport(composedWord)
                             }
                         }) {
-                            Text(isReported ? "Mot signalé (Annuler)" : "Signaler ce mot")
+                            Text(reportButtonState.buttonText)
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         }
