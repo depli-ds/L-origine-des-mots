@@ -22,7 +22,7 @@ struct FavoriteWordsView: View {
                                 .accessibilityLabel("Ouvrir \(favorite.name)")
                             Button(action: { 
                                 // Animation étoile : pleine bleue → vide bleue → disparition
-                                withAnimation(.easeInOut(duration: 0.15)) {
+                                let _ = withAnimation(.easeInOut(duration: 0.15)) {
                                     animatingStars.insert(favorite.id)
                                 }
                                 

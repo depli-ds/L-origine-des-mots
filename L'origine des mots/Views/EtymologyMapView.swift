@@ -6,6 +6,7 @@ struct EtymologyMapView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var historicalLocations: [HistoricalLocation] = []
     @State private var isLoading = true
+    @State private var hasInitializedCamera = false // Flag pour éviter multiples animations
     @State private var cameraPosition: MapCameraPosition = .camera(MapCamera(
         centerCoordinate: CLLocationCoordinate2D(latitude: 45.0, longitude: 10.0),
         distance: 10000000,
@@ -110,8 +111,18 @@ struct EtymologyMapView: View {
                             ))
                     }
                 }
+                .onMapCameraChange { context in
+                    // Log des paramètres à chaque changement de caméra
+                    let lat = Int(context.camera.centerCoordinate.latitude)
+                    let lon = Int(context.camera.centerCoordinate.longitude)
+                    let dist = Int(context.camera.distance)
+                    let pitch = Int(context.camera.pitch)
+                    
+                    print("Latitude \(lat), Longitude \(lon), Distance \(dist), Pitch \(pitch)")
+                }
                 .mapStyle(.imagery(elevation: .realistic))
                 .preferredColorScheme(.dark)
+                .mapControlVisibility(.hidden) // Optimisation cache
                 .navigationBarHidden(true)
                 .overlay(alignment: .top) {
                     // En-tête avec titre centré et bouton de fermeture
@@ -190,14 +201,71 @@ struct EtymologyMapView: View {
                 let coordinates = historicalLocations.map(\.coordinates)
                 let region = calculateRegion(for: coordinates)
                 
-                // Animation de dezoom
-                withAnimation(.easeInOut(duration: 0.5)) {
+                // Centrage automatique intelligent avec élasticité pour forcer l'affichage des textes
+                let calculatedDistance = max(region.span.latitudeDelta, region.span.longitudeDelta) * 150000
+                let finalDistance = max(calculatedDistance, 2000000) // Distance minimale pour lisibilité
+                
+                print("🎯 CENTRAGE AUTO - Distance calculée: \(Int(finalDistance))")
+                print("🎯 CENTRAGE AUTO - Centre: lat \(region.center.latitude), lon \(region.center.longitude)")
+                
+                if !hasInitializedCamera { // Éviter multiples repositionnements
+                    let finalCenter = region.center
+                    
+                    print("🎯 CENTRAGE AUTO - Position: lat \(finalCenter.latitude), lon \(finalCenter.longitude)")
+                    print("🎯 CENTRAGE AUTO - Distance: \(Int(finalDistance))")
+                    
+                    // 🔧 DOUBLE MICRO-MOUVEMENT - Force MapKit première ouverture
+                    let microMovement = 0.02  // Légèrement plus pour première ouverture
+                    
+                    let microStart = CLLocationCoordinate2D(
+                        latitude: finalCenter.latitude,
+                        longitude: finalCenter.longitude - microMovement
+                    )
+                    
+                    let microMid = CLLocationCoordinate2D(
+                        latitude: finalCenter.latitude,
+                        longitude: finalCenter.longitude + microMovement  // Rebond opposé
+                    )
+                    
+                    print("🔧 DOUBLE MICRO-MOUVEMENT - Force initialisation MapKit première carte")
+                    
+                    // Position initiale avec micro-décalage
                     cameraPosition = .camera(MapCamera(
-                        centerCoordinate: region.center,
-                        distance: max(region.span.latitudeDelta, region.span.longitudeDelta) * 200000,
+                        centerCoordinate: microStart,
+                        distance: finalDistance,
                         heading: 0,
-                        pitch: 60
+                        pitch: 45
                     ))
+                    
+                    // Premier micro-mouvement (force initialisation)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        print("🔄 PREMIER MICRO-MOUVEMENT - Réveil MapKit")
+                        
+                        withAnimation(.linear(duration: 0.2)) {
+                            cameraPosition = .camera(MapCamera(
+                                centerCoordinate: microMid,
+                                distance: finalDistance,
+                                heading: 0,
+                                pitch: 45
+                            ))
+                        }
+                    }
+                    
+                    // Deuxième micro-mouvement vers position finale
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        print("🎯 POSITION FINALE - Double micro-mouvement terminé")
+                        
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            cameraPosition = .camera(MapCamera(
+                                centerCoordinate: finalCenter,
+                                distance: finalDistance,
+                                heading: 0,
+                                pitch: 45
+                            ))
+                        }
+                        
+                        hasInitializedCamera = true
+                    }
                 }
             }
             isLoading = false
