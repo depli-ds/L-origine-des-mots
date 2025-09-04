@@ -22,8 +22,38 @@ struct RemarkableWordsCurationView: View {
     @State private var sortOption: SortOption = .alphabetical
     @State private var refreshTrigger: Double = 0
     
+    // AJOUT: États pour favoris et signalements
+    @State private var favoriteWords: [String: String] = {
+        if let data = UserDefaults.standard.data(forKey: "favoriteWords"),
+           let decoded = try? JSONDecoder().decode([String: String].self, from: data) {
+            return decoded
+        }
+        return [:]
+    }()
+    @State private var reportedWords: [ReportedWord] = {
+        if let data = UserDefaults.standard.data(forKey: "reportedWords"),
+           let decoded = try? JSONDecoder().decode([ReportedWord].self, from: data) {
+            return decoded
+        }
+        return []
+    }()
+    
     private var totalWords: Int { allWords.count }
     private var remarkableWords: Int { allWords.filter { $0.isRemarkable }.count }
+    
+    // AJOUT: Fonction pour déterminer l'état des signalements
+    private func getReportButtonState(for word: Word) -> ReportButtonState {
+        guard let report = reportedWords.first(where: { $0.id == word.id }) else {
+            return .notReported
+        }
+        
+        // Si le mot a été mis à jour après le signalement → Corrigé
+        if word.updatedAt > report.reportDate {
+            return .corrected
+        } else {
+            return .reported
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -53,7 +83,11 @@ struct RemarkableWordsCurationView: View {
                                     onDelete: {
                                         await deleteWord(word)
                                     },
-                                    refreshTrigger: refreshTrigger
+                                    refreshTrigger: refreshTrigger,
+                                    isFavorite: favoriteWords[word.id] != nil,
+                                    favoriteCount: word.favoriteCount,
+                                    reportButtonState: getReportButtonState(for: word),
+                                    reportCount: word.reportCount
                                 )
                                 .padding(.horizontal)
                                 .padding(.vertical, 4)
@@ -89,9 +123,23 @@ struct RemarkableWordsCurationView: View {
     }
     
     private var headerView: some View {
-        HStack(spacing: 30) {
-            StatCard(title: "Total", value: "\(totalWords)", color: .blue)
-            StatCard(title: "Remarquables", value: "\(remarkableWords)", color: .yellow)
+        VStack(spacing: 12) {
+            // Ligne principale
+            HStack(spacing: 30) {
+                StatCard(title: "Total", value: "\(totalWords)", color: .blue)
+                StatCard(title: "Remarquables", value: "\(remarkableWords)", color: .yellow)
+            }
+            
+            // AJOUT: Ligne favoris et signalements
+            HStack(spacing: 30) {
+                let favoritesCount = allWords.filter { favoriteWords[$0.id] != nil }.count
+                let reportsCount = allWords.filter { word in 
+                    reportedWords.contains { $0.id == word.id }
+                }.count
+                
+                StatCard(title: "Favoris", value: "\(favoritesCount)", color: .cyan)
+                StatCard(title: "Signalés", value: "\(reportsCount)", color: .orange)
+            }
         }
         .padding()
         .background(Color(.systemGray6))
@@ -295,6 +343,10 @@ struct ModernWordCurationRow: View {
     let onToggleRemarkable: (Bool) async -> Void
     let onDelete: () async -> Void
     let refreshTrigger: Double
+    let isFavorite: Bool
+    let favoriteCount: Int?
+    let reportButtonState: ReportButtonState
+    let reportCount: Int?
     
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -322,6 +374,24 @@ struct ModernWordCurationRow: View {
                     Label("\(word.etymology.chain.count) étapes", systemImage: "arrow.triangle.turn.up.right.diamond")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                    
+                    // AJOUT: Indicateur favori
+                    if isFavorite {
+                        Label("\(favoriteCount ?? 0)", systemImage: "star.fill")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                    }
+                    
+                    // AJOUT: Indicateur signalement
+                    if reportButtonState != .notReported {
+                        let (icon, color) = reportButtonState == .corrected ? 
+                            ("checkmark.circle.fill", Color.green) : 
+                            ("exclamationmark.triangle.fill", Color.orange)
+                        
+                        Label("\(reportCount ?? 0)", systemImage: icon)
+                            .font(.caption)
+                            .foregroundColor(color)
+                    }
                     
                     Spacer()
                 }
