@@ -1768,7 +1768,7 @@ class SupabaseService: @unchecked Sendable {
     /// Récupère tous les mots de la base (tri par date de création)
     func fetchAllWordsByDate() async throws -> [Word] {
         let url = baseURL.appendingPathComponent("etymologies")
-            .appendingQueryItem("select", value: "id,word,etymology,created_at,is_remarkable,distance_km,short_description,is_composed_word,components")
+            .appendingQueryItem("select", value: "id,word,etymology,created_at,is_remarkable,distance_km,short_description,is_composed_word,components,favorite_count,report_count")
             .appendingQueryItem("order", value: "created_at.desc")
             .appendingQueryItem("limit", value: "500")  // ✅ Limite explicite pour éviter le problème
         
