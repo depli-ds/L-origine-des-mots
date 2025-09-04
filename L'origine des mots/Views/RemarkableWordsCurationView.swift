@@ -3,11 +3,15 @@ import SwiftUI
 enum SortOption: String, CaseIterable {
     case alphabetical = "Alphabétique"
     case date = "Date d'ajout"
+    case favorites = "Favoris"
+    case reports = "Signalés"
     
     var icon: String {
         switch self {
         case .alphabetical: return "textformat.abc"
         case .date: return "calendar"
+        case .favorites: return "star.fill"
+        case .reports: return "exclamationmark.triangle.fill"
         }
     }
 }
@@ -102,7 +106,8 @@ struct RemarkableWordsCurationView: View {
                     }
                 }
             }
-            .navigationTitle("Curation")
+            .navigationTitle("")
+            .navigationBarHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Fermer") { 
@@ -123,26 +128,22 @@ struct RemarkableWordsCurationView: View {
     }
     
     private var headerView: some View {
-        VStack(spacing: 12) {
-            // Ligne principale
-            HStack(spacing: 30) {
-                StatCard(title: "Total", value: "\(totalWords)", color: .blue)
-                StatCard(title: "Remarquables", value: "\(remarkableWords)", color: .yellow)
-            }
+        VStack(spacing: 4) {
+            Text("Curation")
+                .font(.title2)
+                .fontWeight(.semibold)
             
-            // AJOUT: Ligne favoris et signalements
-            HStack(spacing: 30) {
-                let favoritesCount = allWords.filter { favoriteWords[$0.id] != nil }.count
-                let reportsCount = allWords.filter { word in 
-                    reportedWords.contains { $0.id == word.id }
-                }.count
-                
-                StatCard(title: "Favoris", value: "\(favoritesCount)", color: .cyan)
-                StatCard(title: "Signalés", value: "\(reportsCount)", color: .orange)
-            }
+            // Stats en petit sous le titre
+            let favoritesCount = allWords.filter { favoriteWords[$0.id] != nil }.count
+            let reportsCount = allWords.filter { word in 
+                reportedWords.contains { $0.id == word.id }
+            }.count
+            
+            Text("\(totalWords) mots • \(remarkableWords) remarquables • \(favoritesCount) favoris • \(reportsCount) signalés")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
-        .padding()
-        .background(Color(.systemGray6))
+        .padding(.vertical, 8)
     }
     
     private var sortingView: some View {
@@ -189,6 +190,20 @@ struct RemarkableWordsCurationView: View {
             return filtered.sorted { $0.word.localizedCaseInsensitiveCompare($1.word) == .orderedAscending }
         case .date:
             return filtered.sorted { $0.createdAt > $1.createdAt }
+        case .favorites:
+            return filtered.sorted { word1, word2 in
+                let isFav1 = favoriteWords[word1.id] != nil
+                let isFav2 = favoriteWords[word2.id] != nil
+                if isFav1 != isFav2 { return isFav1 } // Favoris en premier
+                return (word1.favoriteCount ?? 0) > (word2.favoriteCount ?? 0) // Puis par count
+            }
+        case .reports:
+            return filtered.sorted { word1, word2 in
+                let isReported1 = reportedWords.contains { $0.id == word1.id }
+                let isReported2 = reportedWords.contains { $0.id == word2.id }
+                if isReported1 != isReported2 { return isReported1 } // Signalés en premier
+                return (word1.reportCount ?? 0) > (word2.reportCount ?? 0) // Puis par count
+            }
         }
     }
     
