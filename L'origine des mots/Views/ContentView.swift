@@ -283,7 +283,7 @@ struct ContentView: View {
                         searchText = wordName
                         isSearchFieldFocused = false // Pas de focus clavier
                     }
-                    await performSearch() // Passe par toute la logique de recherche
+                    performSearch() // Passe par toute la logique de recherche
                 }
             }
         } catch {
@@ -294,7 +294,7 @@ struct ContentView: View {
                     searchText = wordName
                     isSearchFieldFocused = false
                 }
-                await performSearch()
+                performSearch()
             }
         }
     }
