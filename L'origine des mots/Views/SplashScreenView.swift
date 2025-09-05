@@ -19,7 +19,7 @@ struct SplashScreenView: View {
                     
                     VStack(spacing: 8) {
                         // Titre dans le même style que l'app
-                        Text("L'origine des mots")
+                        Text("La route des mots")
                             .font(.title)
                             .fontWeight(.medium)
                             .foregroundColor(.primary)

@@ -290,7 +290,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "L'origine des mots/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "L’origine des mots";
+				INFOPLIST_KEY_CFBundleDisplayName = "La route des mots";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Nous avons besoin d'accéder au microphone pour la reconnaissance vocale";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Nous avons besoin d'utiliser la reconnaissance vocale pour transcrire vos mots";
@@ -324,7 +324,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "L'origine des mots/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "L’origine des mots";
+				INFOPLIST_KEY_CFBundleDisplayName = "La route des mots";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Nous avons besoin d'accéder au microphone pour la reconnaissance vocale";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Nous avons besoin d'utiliser la reconnaissance vocale pour transcrire vos mots";
