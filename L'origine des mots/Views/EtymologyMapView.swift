@@ -1,12 +1,16 @@
 import SwiftUI
 import MapKit
 
-struct EtymologyMapView: View {
+struct EtymologyMapView<DetailContent: View>: View {
     let word: Word
+    let showsLearnMore: Bool
+    @ViewBuilder let detailContent: () -> DetailContent
+    
     @Environment(\.dismiss) private var dismiss
     @State private var historicalLocations: [HistoricalLocation] = []
     @State private var isLoading = true
     @State private var hasInitializedCamera = false // Flag pour éviter multiples animations
+    @State private var showingDetail = false
     @State private var cameraPosition: MapCameraPosition = .camera(MapCamera(
         centerCoordinate: CLLocationCoordinate2D(latitude: 45.0, longitude: 10.0),
         distance: 10000000,
@@ -14,8 +18,14 @@ struct EtymologyMapView: View {
         pitch: 60
     ))
     
-    init(word: Word) {
+    init(
+        word: Word,
+        showsLearnMore: Bool = true,
+        @ViewBuilder detailContent: @escaping () -> DetailContent
+    ) {
         self.word = word
+        self.showsLearnMore = showsLearnMore
+        self.detailContent = detailContent
     }
     
     var coordinates: [CLLocationCoordinate2D] {
@@ -36,27 +46,25 @@ struct EtymologyMapView: View {
     var body: some View {
         Group {
             if isLoading {
-                ProgressView("Chargement de la carte...")
-            } else if historicalLocations.isEmpty {
-                VStack {
-                    Image(systemName: "map")
-                        .font(.system(size: 50))
-                        .foregroundColor(.gray)
-                    Text("Aucune localisation disponible")
-                        .font(.title2)
-                        .foregroundColor(.gray)
-                    Text("Ajoutez les langues manquantes pour voir la route")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
+                ZStack {
+                    ProgressView("Chargement de la carte...")
+                    mapChromeOverlay(showLearnMore: showsLearnMore, closeButtonColor: .gray)
                 }
-                .overlay(alignment: .topTrailing) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title)
+            } else if historicalLocations.isEmpty {
+                ZStack {
+                    VStack {
+                        Image(systemName: "map")
+                            .font(.system(size: 50))
                             .foregroundColor(.gray)
+                        Text("Aucune localisation disponible")
+                            .font(.title2)
+                            .foregroundColor(.gray)
+                        Text("Ajoutez les langues manquantes pour voir la route")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
                     }
-                    .padding()
+                    mapChromeOverlay(showLearnMore: showsLearnMore, closeButtonColor: .gray)
                 }
             } else {
                 Map(position: $cameraPosition) {
@@ -124,36 +132,75 @@ struct EtymologyMapView: View {
                 .preferredColorScheme(.dark)
                 .mapControlVisibility(.hidden) // Optimisation cache
                 .navigationBarHidden(true)
-                .overlay(alignment: .top) {
-                    // En-tête avec titre centré et bouton de fermeture
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 4) {
-                            Text("Voyage du mot :")
-                                .font(.system(size: 16, weight: .light))
-                                .foregroundColor(.white.opacity(0.9))
-                                .shadow(color: .black, radius: 2)
-                            Text(word.word)
-                                .font(.system(size: 24, weight: .medium))
-                                .foregroundColor(.white)
-                                .shadow(color: .black, radius: 2)
-                        }
-                        Spacer()
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.title)
-                                .foregroundColor(.white)
-                                .shadow(color: .black, radius: 2)
-                        }
-                        .padding(.leading, -40)
-                    }
-                    .padding(.top, 20)
-                    .padding(.horizontal, 20)
+                .overlay {
+                    mapChromeOverlay(showLearnMore: showsLearnMore)
                 }
             }
         }
+        .sheet(isPresented: $showingDetail) {
+            detailContent()
+        }
         .task {
             await loadLocations()
+        }
+    }
+    
+    @ViewBuilder
+    private func mapChromeOverlay(showLearnMore: Bool, closeButtonColor: Color = .white) -> some View {
+        VStack {
+            // En-tête avec titre centré et bouton de fermeture
+            HStack {
+                Spacer()
+                VStack(spacing: 4) {
+                    Text("Voyage du mot :")
+                        .font(.system(size: 16, weight: .light))
+                        .foregroundColor(closeButtonColor == .white ? .white.opacity(0.9) : .secondary)
+                        .shadow(color: closeButtonColor == .white ? .black : .clear, radius: 2)
+                    Text(word.word)
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundColor(closeButtonColor == .white ? .white : .primary)
+                        .shadow(color: closeButtonColor == .white ? .black : .clear, radius: 2)
+                }
+                Spacer()
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title)
+                        .foregroundColor(closeButtonColor)
+                        .shadow(color: closeButtonColor == .white ? .black : .clear, radius: 2)
+                }
+                .padding(.leading, -40)
+            }
+            .padding(.top, 20)
+            .padding(.horizontal, 20)
+            
+            Spacer()
+            
+            if showLearnMore {
+                Group {
+                    if #available(iOS 26.0, *) {
+                        Button("En savoir plus") {
+                            showingDetail = true
+                        }
+                        .buttonStyle(.glass)
+                        .controlSize(.large)
+                    } else {
+                        Button(action: { showingDetail = true }) {
+                            Text("En savoir plus")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(.primary)
+                                .padding(.horizontal, 28)
+                                .padding(.vertical, 14)
+                                .background(
+                                    Capsule()
+                                        .fill(.ultraThinMaterial)
+                                        .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
+                                )
+                        }
+                    }
+                }
+                .padding(.horizontal, 40)
+                .padding(.bottom, 36)
+            }
         }
     }
     
@@ -456,6 +503,8 @@ struct MapView: View {
 }
 
 #Preview {
-    EtymologyMapView(word: Word.previewExample)
+    EtymologyMapView(word: Word.previewExample, showsLearnMore: false) {
+        EmptyView()
+    }
 } 
 

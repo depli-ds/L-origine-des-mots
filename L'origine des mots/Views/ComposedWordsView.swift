@@ -10,7 +10,6 @@ struct ComposedWordsView: View {
     
     @State private var componentWords: [Word] = []
     @State private var isLoadingComponents = true
-    @State private var showingMapForWord: Word?
     @State private var showingSourcesForWord: Word?
     @State private var isBorrowedComposition = false
     @Environment(\.dismiss) private var dismiss
@@ -69,38 +68,16 @@ struct ComposedWordsView: View {
                             }
                         }
                         
-                        // Boutons d'action pour le mot composé
-                        HStack(spacing: 20) {
-                            if composedWord.hasGeographicalJourney {
-                                Button(action: { 
-                                    print("🔘 Clic bouton voyage pour: '\(composedWord.word)' (mot principal)")
-                                    showingMapForWord = composedWord
-                                    print("🔘 showingMapForWord assigné à: '\(showingMapForWord?.word ?? "nil")'")
-                                }) {
-                                    Label("Voir le voyage du mot", systemImage: "map.fill")
-                                        .foregroundColor(.blue)
-                                }
-                                
-                                Spacer()
-                                
-                                Button(action: { 
-                                    showingSourcesForWord = composedWord
-                                }) {
-                                    Label("Sources", systemImage: "text.book.closed.fill")
-                                        .foregroundColor(.blue)
-                                }
-                            } else {
-                                Spacer()
-                                
-                                Button(action: { 
-                                    showingSourcesForWord = composedWord
-                                }) {
-                                    Label("Sources", systemImage: "text.book.closed.fill")
-                                        .foregroundColor(.blue)
-                                }
-                                
-                                Spacer()
+                        // Bouton Sources (centré)
+                        HStack {
+                            Spacer()
+                            Button(action: { 
+                                showingSourcesForWord = composedWord
+                            }) {
+                                Label("Sources", systemImage: "text.book.closed.fill")
+                                    .foregroundColor(.blue)
                             }
+                            Spacer()
                         }
                         .padding(.top, 20)
                         
@@ -146,38 +123,16 @@ struct ComposedWordsView: View {
                                     }
                                 }
                                 
-                                // Boutons d'action pour chaque composant
-                                HStack(spacing: 20) {
-                                    if word.hasGeographicalJourney {
-                                        Button(action: { 
-                                            print("🔘 Clic bouton voyage pour: '\(word.word)' (composant \(index))")
-                                            showingMapForWord = word
-                                            print("🔘 showingMapForWord assigné à: '\(showingMapForWord?.word ?? "nil")'")
-                                        }) {
-                                            Label("Voir le voyage du mot", systemImage: "map.fill")
-                                                .foregroundColor(.blue)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Button(action: { 
-                                            showingSourcesForWord = word
-                                        }) {
-                                            Label("Sources", systemImage: "text.book.closed.fill")
-                                                .foregroundColor(.blue)
-                                        }
-                                    } else {
-                                        Spacer()
-                                        
-                                        Button(action: { 
-                                            showingSourcesForWord = word
-                                        }) {
-                                            Label("Sources", systemImage: "text.book.closed.fill")
-                                                .foregroundColor(.blue)
-                                        }
-                                        
-                                        Spacer()
+                                // Bouton Sources (centré)
+                                HStack {
+                                    Spacer()
+                                    Button(action: { 
+                                        showingSourcesForWord = word
+                                    }) {
+                                        Label("Sources", systemImage: "text.book.closed.fill")
+                                            .foregroundColor(.blue)
                                     }
+                                    Spacer()
                                 }
                                 .padding(.top, 20)
                                 
@@ -230,15 +185,6 @@ struct ComposedWordsView: View {
                 .padding(.top, 40)
             }
             .navigationBarHidden(true)
-            .sheet(item: $showingMapForWord) { word in
-                EtymologyMapView(word: word)
-                    .onAppear {
-                        print("🔘 Sheet carte ouverte pour: '\(word.word)'")
-                        print("🗺️ Distance: \(word.distanceKm ?? 0) km")
-                        print("🗺️ Étymologie: \(word.etymology.chain.count) étapes")
-                        print("🗺️ hasGeographicalJourney: \(word.hasGeographicalJourney)")
-                    }
-            }
             .sheet(item: $showingSourcesForWord) { word in
                 SourcesView(word: word, context: .component)
             }

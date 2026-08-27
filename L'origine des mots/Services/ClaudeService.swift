@@ -87,7 +87,7 @@ class ClaudeService: @unchecked Sendable {
         request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         
                 let requestBody: [String: Any] = [
-             "model": "claude-sonnet-4-20250514",
+             "model": "claude-sonnet-4-6",
              "max_tokens": 4000,
             "messages": [
                 [

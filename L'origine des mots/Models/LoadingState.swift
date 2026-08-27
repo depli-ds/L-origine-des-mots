@@ -23,7 +23,7 @@ enum LoadingState: Equatable {
         case .loadingWord:
             return "Recherche du mot..."
         case .searchingCNRTL:
-            return "Consultation CNRTL.fr..."
+            return "Consultation du Portail lexical..."
         case .extractingEtymology:
             return "Extraction des données étymologiques..."
         case .loadingLanguages:

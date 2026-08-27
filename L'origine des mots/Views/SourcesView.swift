@@ -33,10 +33,11 @@ struct SourcesView: View {
                             .padding(.bottom, 4)
                     }
                     
-                    // Lien spécifique au mot si fourni ET trouvé dans CNRTL
-                    if let word = word, word.foundInCNRTL {
-                        Link("• Voir le mot \(word.word) sur CNRTL", 
-                             destination: URL(string: "https://www.cnrtl.fr/etymologie/\(word.word.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? word.word)")!)
+                    // Lien spécifique au mot si trouvé dans le Portail lexical
+                    if let word = word, word.foundInCNRTL,
+                       let destination = CNRTLService.publicEtymologyURL(for: word.word) {
+                        Link("• Voir le mot \(word.word) sur le Portail lexical",
+                             destination: destination)
                             .foregroundColor(.blue)
                             .font(.system(size: 16))
                             .padding(.bottom, 8)
@@ -58,15 +59,15 @@ struct SourcesView: View {
                         }
                     }
                     
-                    // Lien général CNRTL seulement si pas de lien spécifique
+                    // Lien général seulement si pas de lien spécifique
                     if word?.foundInCNRTL != true {
-                        Link("• CNRTL - Centre National de Ressources Textuelles et Lexicales", 
-                             destination: URL(string: "https://www.cnrtl.fr")!)
+                        Link("• Portail lexical (CNRTL / ATILF)",
+                             destination: URL(string: "https://www.portail-lexical.fr")!)
                             .foregroundColor(.blue)
                             .font(.system(size: 16))
                     }
                     
-                    Text("Les étymologies sont recherchées automatiquement dans cette source académique.")
+                    Text("Les étymologies sont recherchées automatiquement dans le Portail lexical (TLFi / ATILF).")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.top, 8)

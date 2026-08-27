@@ -39,8 +39,8 @@ class EtymologyOrchestrator {
     func processNewWord(_ word: String) async throws -> Word {
         print("\n🎯 Démarrage de l'orchestration pour le mot '\(word)'")
         
-        // 1. Vérification CNRTL
-        print("📚 Étape 1: Vérification CNRTL...")
+        // 1. Vérification Portail lexical (repli CNRTL legacy si besoin)
+        print("📚 Étape 1: Vérification Portail lexical...")
         let (cnrtlURL, sourceState) = try await cnrtlService.fetchEtymology(for: word)
         
         // 2. Extraction du texte étymologique
@@ -51,27 +51,24 @@ class EtymologyOrchestrator {
             etymologyText = try await cnrtlService.fetchEtymologyText(from: cnrtlURL)
             print("✅ Texte extrait (\(etymologyText.count) caractères)")
         } catch CNRTLError.maxRedirectsReached {
-            // Cas spécial pour les mots avec des références circulaires (comme "rouge")
             print("⚠️ Références circulaires détectées - tentative d'extraction directe...")
             
-            // Au lieu de rejeter, essayons d'extraire le contenu directement
             do {
                 etymologyText = try await extractEtymologyDirectly(from: cnrtlURL)
                 print("✅ Extraction directe réussie (\(etymologyText.count) caractères)")
             } catch {
                 print("❌ Échec de l'extraction directe: \(error)")
-                throw EtymologyError.networkError("Le mot '\(word)' contient des références circulaires sur CNRTL et l'extraction directe a échoué.")
+                throw EtymologyError.networkError("Le mot '\(word)' contient des références circulaires et l'extraction directe a échoué.")
             }
         } catch CNRTLError.sectionNotFound {
-            // Cas spécial pour les mots avec des sections d'étymologie non standard ou fausses références (comme "robot")
-            print("⚠️ Section étymologique non trouvée par le service standard - tentative d'extraction directe...")
+            print("⚠️ Section étymologique non trouvée — tentative d'extraction directe...")
             
             do {
                 etymologyText = try await extractEtymologyDirectly(from: cnrtlURL)
                 print("✅ Extraction directe réussie (\(etymologyText.count) caractères)")
             } catch {
                 print("❌ Échec de l'extraction directe: \(error)")
-                throw EtymologyError.networkError("Le mot '\(word)' n'a pas pu être extrait depuis CNRTL malgré les tentatives d'extraction directe.")
+                throw EtymologyError.networkError("Le mot '\(word)' n'a pas pu être extrait depuis le Portail lexical.")
             }
         }
         
@@ -155,7 +152,7 @@ class EtymologyOrchestrator {
             word: word.lowercased().trimmingCharacters(in: .whitespaces),
             etymology: DirectEtymology(chain: etymologyAnalysis.etymology.chain),
             language: "français",
-            source: "CNRTL + Claude",
+            source: "Portail lexical + Claude",
             createdAt: Date(),
             updatedAt: Date(),
             foundInCNRTL: sourceState == .foundInCNRTL,
@@ -219,9 +216,20 @@ class EtymologyOrchestrator {
             }
         }
     }    
-    /// Extrait l'étymologie directement d'une page CNRTL sans suivre les références
+    /// Extraction de secours quand le flux principal échoue (API JSON ou HTML legacy)
     private func extractEtymologyDirectly(from urlString: String) async throws -> String {
         print("🔧 Extraction directe d'étymologie depuis: \(urlString)")
+        
+        // Les URLs Portail lexical : tenter le mot via le HTML legacy en secours
+        if urlString.contains("portail-lexical.fr") {
+            if let form = urlString.split(separator: "/").drop(while: { $0 != "word" }).dropFirst().first.map(String.init),
+               let decoded = form.removingPercentEncoding {
+                let legacyURL = "https://www.cnrtl.fr/etymologie/\(decoded)"
+                print("🔧 Repli extraction legacy pour '\(decoded)'")
+                return try await cnrtlService.fetchEtymologyText(from: legacyURL)
+            }
+            throw EtymologyError.analysisError("Impossible d'extraire l'étymologie via le Portail lexical")
+        }
         
         guard let url = URL(string: urlString) else {
             throw EtymologyError.networkError("URL invalide: \(urlString)")
@@ -236,27 +244,26 @@ class EtymologyOrchestrator {
             throw EtymologyError.networkError("Impossible de décoder la page HTML")
         }
         
-        // Patterns d'étymologie étendus pour couvrir différents formats
         let etymologyPatterns = [
-            "[ÉE]TYMOL\\.", // Pattern standard
-            "\\*\\*[ÉE]tymol\\. et Hist\\.\\*\\*", // **Étymol. et Hist.** pour robot
-            "[ÉE]TYMOL\\. ET HIST\\.", // ÉTYMOL. ET HIST. en majuscules
-            "[ÉE]tym\\. et Hist\\.", // Etym. et Hist.
-            "[ÉE]tym\\." // "Etym." au lieu de "ÉTYMOL."
+            "[ÉE]TYMOL\\.",
+            "\\*\\*[ÉE]tymol\\. et Hist\\.\\*\\*",
+            "[ÉE]TYMOL\\. ET HIST\\.",
+            "[ÉE]tym\\. et Hist\\.",
+            "[ÉE]tym\\.",
+            "s-etymology"
         ]
         
         for pattern in etymologyPatterns {
             if let start = html.range(of: pattern, options: [.regularExpression, .caseInsensitive]) {
                 print("🎯 Pattern d'étymologie trouvé: \(pattern)")
                 
-                // Chercher la fin de la section
                 let searchRange = start.upperBound..<html.endIndex
                 let endPatterns = [
-                    "</td>", // Fin de cellule de tableau
-                    "<div", "<p>", "<h[1-6]", 
+                    "</td>",
+                    "<div", "<p>", "<h[1-6]",
                     "HIST\\.", "SYNT\\.", "REM\\.",
-                    "\\*\\*[A-Z]+\\*\\*", // Autre section en gras
-                    "©.*?CNRTL" // Copyright
+                    "\\*\\*[A-Z]+\\*\\*",
+                    "©.*?CNRTL"
                 ]
                 
                 var closestEnd: String.Index = html.endIndex
@@ -268,26 +275,19 @@ class EtymologyOrchestrator {
                     }
                 }
                 
-                var etymologyText = String(html[start.lowerBound..<closestEnd])
-                    .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression) // Remplacer par espace
-                    .replacingOccurrences(of: "\\*\\*", with: "", options: .regularExpression) // Enlever les balises gras markdown
-                    .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                
-                // Ne plus supprimer les références - laisser Claude faire le tri
-                etymologyText = etymologyText
+                let etymologyText = String(html[start.lowerBound..<closestEnd])
+                    .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+                    .replacingOccurrences(of: "\\*\\*", with: "", options: .regularExpression)
                     .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                 
                 if etymologyText.count >= 50 {
                     print("✅ Étymologie extraite directement (\(etymologyText.count) caractères)")
-                    print("📝 Aperçu: \(String(etymologyText.prefix(150)))...")
                     return etymologyText
                 }
             }
         }
         
-        // Si aucun pattern ne fonctionne, essayer une extraction générale
         throw EtymologyError.analysisError("Impossible d'extraire l'étymologie de la page")
     }
 } 

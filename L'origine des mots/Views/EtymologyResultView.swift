@@ -15,7 +15,6 @@ struct EtymologyResultView: View {
     
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
-    @State private var showingMap = false
     @State private var showingSources = false
     
     var body: some View {
@@ -48,31 +47,13 @@ struct EtymologyResultView: View {
                     }
                 }
                 
-                HStack(spacing: 20) {
-                    // Afficher le bouton seulement s'il y a un voyage géographique potentiel
-                    if word.hasGeographicalJourney {
-                        Button(action: { showingMap = true }) {
-                            Label("Voir le voyage du mot", systemImage: "map.fill")
-                                .foregroundColor(.blue)
-                        }
-                        
-                        Spacer()
-                        
-                        Button(action: { showingSources = true }) {
-                            Label("Sources", systemImage: "text.book.closed.fill")
-                                .foregroundColor(.blue)
-                        }
-                    } else {
-                        // Centrer le bouton sources quand pas de voyage
-                        Spacer()
-                        
-                        Button(action: { showingSources = true }) {
-                            Label("Sources", systemImage: "text.book.closed.fill")
-                                .foregroundColor(.blue)
-                        }
-                        
-                        Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: { showingSources = true }) {
+                        Label("Sources", systemImage: "text.book.closed.fill")
+                            .foregroundColor(.blue)
                     }
+                    Spacer()
                 }
                 .padding(.top, 40)
                 
@@ -116,9 +97,6 @@ struct EtymologyResultView: View {
                 .padding(.top, 16)
             }
             .padding(24)
-        }
-        .sheet(isPresented: $showingMap) {
-            EtymologyMapView(word: word)
         }
         .sheet(isPresented: $showingSources) {
             SourcesView(word: word, context: .mainWord)

@@ -19,6 +19,7 @@ struct ContentView: View {
     @State private var searchText = ""
     @State private var selectedWord: Word?
     @State private var showingEtymology = false
+    @State private var showingMap = false
     @State private var loadingState: LoadingState = .idle
     @State private var searchHistory: [String] = UserDefaults.standard.stringArray(forKey: "searchHistory") ?? []
     @State private var favoriteWords: [String: String] = {
@@ -74,14 +75,7 @@ struct ContentView: View {
                     await MainActor.run {
                         loadingState = .idle
                         addToHistory(wordToSearch)
-                        
-                        if existingWord.isComposedWord && existingWord.components.count >= 2 {
-                            composedWords = [existingWord]
-                            showingComposedWords = true
-                        } else {
-                            selectedWord = existingWord
-                            showingEtymology = true
-                        }
+                        presentSearchResult(for: existingWord)
                     }
                 } else {
                     // Mot non trouvé - création
@@ -94,14 +88,7 @@ struct ContentView: View {
                     await MainActor.run {
                         loadingState = .idle
                         addToHistory(wordToSearch)
-                        
-                        if newWord.isComposedWord && newWord.components.count >= 2 {
-                            composedWords = [newWord]
-                            showingComposedWords = true
-                        } else {
-                            selectedWord = newWord
-                    showingEtymology = true
-                        }
+                        presentSearchResult(for: newWord)
                     }
                 }
             } catch {
@@ -343,16 +330,7 @@ struct ContentView: View {
                     print("   - components.count: \(word.components.count)")
                     print("   - components: \(word.components)")
                     
-                    if word.isComposedWord && word.components.count >= 2 {
-                        print("✅ Affichage ComposedWordsView pour '\(word.word)'")
-                        composedWords = [word]
-                        showingComposedWords = true
-                        print("🔧 DEBUG: showingComposedWords = \(showingComposedWords)")
-                    } else {
-                        print("✅ Affichage EtymologyResultView pour '\(word.word)'")
-                        selectedWord = word
-                        showingEtymology = true
-                    }
+                    presentSearchResult(for: word)
                 }
             } else {
                 // Mot non trouvé - lancer une nouvelle recherche
@@ -411,6 +389,13 @@ struct ContentView: View {
                     isFavorite: favoriteWords[word.id] != nil,
                     reportButtonState: getReportButtonState(for: word)
                 )
+            }
+        }
+        .sheet(isPresented: mapSheetBinding) {
+            if let word = selectedWord {
+                EtymologyMapView(word: word) {
+                    etymologyDetailSheet(for: word)
+                }
             }
         }
         .sheet(isPresented: $showingComposedWords) {
@@ -490,6 +475,69 @@ struct ContentView: View {
                 }
             }
         )
+    }
+    
+    private var mapSheetBinding: Binding<Bool> {
+        Binding(
+            get: { showingMap && selectedWord != nil },
+            set: { newValue in
+                if !newValue {
+                    showingMap = false
+                }
+            }
+        )
+    }
+    
+    /// Affiche la carte en premier s'il y a un voyage géographique, sinon le détail étymologique.
+    private func presentSearchResult(for word: Word) {
+        selectedWord = word
+        
+        let isComposed = word.isComposedWord && word.components.count >= 2
+        if isComposed {
+            composedWords = [word]
+        }
+        
+        if word.hasGeographicalJourney {
+            print("✅ Affichage carte en premier pour '\(word.word)'")
+            showingMap = true
+        } else if isComposed {
+            print("✅ Affichage ComposedWordsView pour '\(word.word)'")
+            showingComposedWords = true
+        } else {
+            print("✅ Affichage EtymologyResultView pour '\(word.word)'")
+            showingEtymology = true
+        }
+    }
+    
+    @ViewBuilder
+    private func etymologyDetailSheet(for word: Word) -> some View {
+        if word.isComposedWord && word.components.count >= 2 {
+            ComposedWordsView(
+                composedWord: word,
+                isPresented: $showingComposedWords,
+                onToggleFavorite: { word in
+                    await toggleFavorite(for: word)
+                },
+                onToggleReport: { word in
+                    await toggleReport(for: word)
+                },
+                isFavorite: favoriteWords[word.id] != nil,
+                reportButtonState: getReportButtonState(for: word)
+            )
+        } else {
+            EtymologyResultView(
+                etymology: word.etymology,
+                word: word,
+                onToggleFavorite: { word in
+                    await toggleFavorite(for: word)
+                },
+                onToggleReport: { word in
+                    await toggleReport(for: word)
+                },
+                isFavorite: favoriteWords[word.id] != nil,
+                reportButtonState: getReportButtonState(for: word)
+            )
+        }
     }
     
     private var mainScrollView: some View {
